@@ -1,10 +1,12 @@
+import { memo } from 'react';
+
 interface MultiplierDisplayProps {
   multiplier: number;
   isFlying: boolean;
   isCrashed: boolean;
 }
 
-export const MultiplierDisplay = ({ 
+export const MultiplierDisplay = memo(({ 
   multiplier, 
   isFlying, 
   isCrashed 
@@ -48,4 +50,4 @@ export const MultiplierDisplay = ({
       )}
     </div>
   );
-};
+});

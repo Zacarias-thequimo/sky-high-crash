@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 
 interface AirplaneProps {
   isFlying: boolean;
   isCrashed: boolean;
 }
 
-export const Airplane = ({ isFlying, isCrashed }: AirplaneProps) => {
+export const Airplane = memo(({ isFlying, isCrashed }: AirplaneProps) => {
   const [animationClass, setAnimationClass] = useState('');
 
   useEffect(() => {
@@ -78,4 +78,4 @@ export const Airplane = ({ isFlying, isCrashed }: AirplaneProps) => {
       )}
     </div>
   );
-};
+});

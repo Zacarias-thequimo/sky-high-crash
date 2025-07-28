@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 interface GameChartProps {
@@ -5,14 +6,14 @@ interface GameChartProps {
   isFlying: boolean;
 }
 
-export const GameChart = ({ data, isFlying }: GameChartProps) => {
-  // Format data for chart
-  const chartData = data.map((point, index) => ({
+export const GameChart = memo(({ data, isFlying }: GameChartProps) => {
+  // Optimize data processing - only keep last 50 points for performance
+  const optimizedData = data.slice(-50).map((point, index) => ({
     index,
     multiplier: point.multiplier
   }));
 
-  if (chartData.length === 0) {
+  if (optimizedData.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center opacity-50">
         <div className="text-muted-foreground">Aguardando próximo voo...</div>
@@ -23,7 +24,7 @@ export const GameChart = ({ data, isFlying }: GameChartProps) => {
   return (
     <div className="h-full w-full relative">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+        <LineChart data={optimizedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <XAxis 
             dataKey="index" 
             hide
@@ -59,4 +60,4 @@ export const GameChart = ({ data, isFlying }: GameChartProps) => {
       </div>
     </div>
   );
-};
+});

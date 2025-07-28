@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, useCallback } from 'react';
 import { Airplane } from './Airplane';
 import { MultiplierDisplay } from './MultiplierDisplay';
 import { GameChart } from './GameChart';
@@ -11,7 +11,7 @@ interface GameAreaProps {
   canCashOut: boolean;
 }
 
-export const GameArea = ({ 
+export const GameArea = memo(({ 
   multiplier, 
   isFlying, 
   isCrashed, 
@@ -21,14 +21,31 @@ export const GameArea = ({
   const [showCrashEffect, setShowCrashEffect] = useState(false);
   const chartData = useRef<{ time: number; multiplier: number }[]>([]);
 
+  // Throttle chart data updates for better performance
+  const lastUpdateRef = useRef(0);
+
   useEffect(() => {
     if (isFlying) {
-      chartData.current.push({ 
-        time: Date.now(), 
-        multiplier: multiplier 
-      });
+      const now = Date.now();
+      // Throttle updates to every 100ms for better performance
+      if (now - lastUpdateRef.current > 100) {
+        chartData.current.push({ 
+          time: now, 
+          multiplier: multiplier 
+        });
+        lastUpdateRef.current = now;
+        
+        // Keep only last 100 points for performance
+        if (chartData.current.length > 100) {
+          chartData.current = chartData.current.slice(-50);
+        }
+      }
     }
   }, [multiplier, isFlying]);
+
+  const handleCashOut = useCallback(() => {
+    onCashOut();
+  }, [onCashOut]);
 
   useEffect(() => {
     if (isCrashed) {
@@ -77,7 +94,7 @@ export const GameArea = ({
       {isFlying && canCashOut && (
         <div className="absolute top-8 right-8">
           <button 
-            onClick={onCashOut}
+            onClick={handleCashOut}
             className="btn-cashout animate-pulse-glow"
           >
             SACAR {multiplier.toFixed(2)}x
@@ -114,4 +131,4 @@ export const GameArea = ({
       )}
     </div>
   );
-};
+});

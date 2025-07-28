@@ -91,7 +91,7 @@ export const GAME_CONFIG = {
   PREPARE_TIME: 3000, // 3 seconds to prepare
   MIN_FLIGHT_TIME: 1000, // Minimum 1 second flight
   MULTIPLIER_INCREMENT: 0.01, // How much multiplier increases per tick
-  TICK_INTERVAL: 50, // Update every 50ms for smooth animation
+  TICK_INTERVAL: 32, // Update every ~32ms (30fps) for smoother animation
 };
 
 export class GameEngine {
@@ -124,8 +124,8 @@ export class GameEngine {
 
     const elapsed = Date.now() - this.gameStartTime;
     
-    // Calculate multiplier based on elapsed time
-    const increment = (elapsed / 1000) * 0.1; // Slower increment for better control
+    // Calculate multiplier based on elapsed time with optimized formula
+    const increment = (elapsed / 1000) * 0.08; // Slightly faster for better feel
     this.currentMultiplier = 1.0 + increment;
 
     this.callbacks.onMultiplierUpdate?.(this.currentMultiplier);
@@ -136,8 +136,8 @@ export class GameEngine {
       return;
     }
 
-    // Continue the game loop
-    setTimeout(() => this.gameLoop(), GAME_CONFIG.TICK_INTERVAL);
+    // Use requestAnimationFrame for better performance
+    requestAnimationFrame(() => this.gameLoop());
   }
 
   private crash() {

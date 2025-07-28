@@ -1,3 +1,5 @@
+import { memo, useMemo } from 'react';
+
 interface GameStatsProps {
   totalBets: number;
   totalWins: number;
@@ -7,7 +9,7 @@ interface GameStatsProps {
   isWinStreak: boolean;
 }
 
-export const GameStats = ({
+export const GameStats = memo(({
   totalBets,
   totalWins,
   totalLosses,
@@ -15,7 +17,10 @@ export const GameStats = ({
   currentStreak,
   isWinStreak
 }: GameStatsProps) => {
-  const winRate = totalBets > 0 ? (totalWins / totalBets) * 100 : 0;
+  const winRate = useMemo(() => 
+    totalBets > 0 ? (totalWins / totalBets) * 100 : 0, 
+    [totalBets, totalWins]
+  );
 
   return (
     <div className="card-game">
@@ -88,4 +93,4 @@ export const GameStats = ({
       </div>
     </div>
   );
-};
+});

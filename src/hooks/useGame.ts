@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameEngine, initializeGame, calculateProfit, calculatePayout } from '@/utils/gameLogic';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,10 +38,10 @@ export const useGame = () => {
     isWinStreak: true
   });
 
-  // Game engine
-  const [gameEngine] = useState(() => new GameEngine({
+  // Game engine - memoized to prevent recreation
+  const gameEngine = useMemo(() => new GameEngine({
     onMultiplierUpdate: (multiplier: number) => {
-      setCurrentMultiplier(multiplier);
+      setCurrentMultiplier(Number(multiplier.toFixed(2))); // Round to prevent floating point issues
     },
     onGameStart: () => {
       setIsFlying(true);
@@ -49,12 +49,13 @@ export const useGame = () => {
       setIsWaitingForNextRound(false);
     },
     onGameCrash: (finalMultiplier: number) => {
-      setCurrentMultiplier(finalMultiplier);
+      const roundedMultiplier = Number(finalMultiplier.toFixed(2));
+      setCurrentMultiplier(roundedMultiplier);
       setIsFlying(false);
       setIsCrashed(true);
       
       // Add to history
-      setMultiplierHistory(prev => [...prev, finalMultiplier]);
+      setMultiplierHistory(prev => [...prev, roundedMultiplier]);
       
       // Handle bet result if player didn't cash out
       if (isBetPlaced && canCashOut) {
@@ -66,7 +67,7 @@ export const useGame = () => {
         startNextRound();
       }, 3000);
     }
-  }));
+  }), []); // Empty dependency array since callbacks are stable
 
   // Initialize game on mount
   useEffect(() => {

@@ -1,8 +1,10 @@
+import { memo, useMemo } from 'react';
+
 interface MultiplierHistoryProps {
   history: number[];
 }
 
-export const MultiplierHistory = ({ history }: MultiplierHistoryProps) => {
+export const MultiplierHistory = memo(({ history }: MultiplierHistoryProps) => {
   const getMultiplierColor = (multiplier: number) => {
     if (multiplier < 2) return 'bg-multiplier-low text-primary-foreground';
     if (multiplier < 10) return 'bg-multiplier-mid text-primary-foreground';
@@ -14,6 +16,16 @@ export const MultiplierHistory = ({ history }: MultiplierHistoryProps) => {
     if (multiplier < 10) return 'Médio';
     return 'Alto';
   };
+
+  // Memoize calculations for better performance
+  const historyStats = useMemo(() => {
+    const lowCount = history.filter(m => m < 2).length;
+    const midCount = history.filter(m => m >= 2 && m < 10).length;
+    const highCount = history.filter(m => m >= 10).length;
+    const displayHistory = history.slice(-20).reverse();
+    
+    return { lowCount, midCount, highCount, displayHistory };
+  }, [history]);
 
   return (
     <div className="card-game">
@@ -45,7 +57,7 @@ export const MultiplierHistory = ({ history }: MultiplierHistoryProps) => {
 
           {/* History Grid */}
           <div className="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto">
-            {history.slice(-20).reverse().map((multiplier, index) => (
+            {historyStats.displayHistory.map((multiplier, index) => (
               <div
                 key={index}
                 className={`
@@ -70,19 +82,19 @@ export const MultiplierHistory = ({ history }: MultiplierHistoryProps) => {
           <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
             <div className="text-center">
               <div className="text-2xl font-bold text-multiplier-low">
-                {history.filter(m => m < 2).length}
+                {historyStats.lowCount}
               </div>
               <div className="text-xs text-muted-foreground">Baixos</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-multiplier-mid">
-                {history.filter(m => m >= 2 && m < 10).length}
+                {historyStats.midCount}
               </div>
               <div className="text-xs text-muted-foreground">Médios</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-multiplier-high">
-                {history.filter(m => m >= 10).length}
+                {historyStats.highCount}
               </div>
               <div className="text-xs text-muted-foreground">Altos</div>
             </div>
@@ -91,4 +103,4 @@ export const MultiplierHistory = ({ history }: MultiplierHistoryProps) => {
       )}
     </div>
   );
-};
+});
