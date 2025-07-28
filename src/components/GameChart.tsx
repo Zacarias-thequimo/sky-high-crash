@@ -21,7 +21,7 @@ export const GameChart = ({ data, isFlying }: GameChartProps) => {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <XAxis 
@@ -36,16 +36,27 @@ export const GameChart = ({ data, isFlying }: GameChartProps) => {
             type="monotone"
             dataKey="multiplier"
             stroke="hsl(var(--primary))"
-            strokeWidth={3}
+            strokeWidth={4}
             dot={false}
             animationDuration={0}
             className="drop-shadow-lg"
             style={{
-              filter: isFlying ? 'drop-shadow(0 0 8px hsl(var(--primary) / 0.5))' : 'none'
+              filter: isFlying ? 'drop-shadow(0 0 12px hsl(var(--primary) / 0.6))' : 'none'
             }}
           />
         </LineChart>
       </ResponsiveContainer>
+      
+      {/* Grid overlay for better visual */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="w-full h-full" style={{
+          background: `
+            linear-gradient(90deg, hsl(var(--primary) / 0.1) 1px, transparent 1px),
+            linear-gradient(hsl(var(--primary) / 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px'
+        }} />
+      </div>
     </div>
   );
 };

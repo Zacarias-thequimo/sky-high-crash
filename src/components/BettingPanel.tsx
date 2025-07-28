@@ -84,7 +84,7 @@ export const BettingPanel = ({
       <div className="text-center">
         <h3 className="text-lg font-bold text-foreground mb-2">Área de Apostas</h3>
         <div className="text-sm text-muted-foreground">
-          Saldo: <span className="text-success font-bold">R$ {balance.toFixed(2)}</span>
+          Saldo: <span className="text-success font-bold">{balance.toFixed(2)} MZN</span>
         </div>
       </div>
 
@@ -114,7 +114,7 @@ export const BettingPanel = ({
             disabled={isFlying}
             className="text-xs"
           >
-            R$ {amount}
+            {amount} MZN
           </Button>
         ))}
       </div>
@@ -133,11 +133,11 @@ export const BettingPanel = ({
         <div className="text-center p-4 bg-accent/50 rounded-lg">
           <div className="text-sm text-muted-foreground">Aposta Ativa</div>
           <div className="text-lg font-bold text-foreground">
-            R$ {betAmount.toFixed(2)}
+            {betAmount.toFixed(2)} MZN
           </div>
           {isFlying && canCashOut && (
             <div className="text-sm text-success mt-1">
-              Ganho potencial: R$ {(betAmount * currentMultiplier).toFixed(2)}
+              Ganho potencial: {(betAmount * currentMultiplier).toFixed(2)} MZN
             </div>
           )}
         </div>

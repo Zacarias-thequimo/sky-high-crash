@@ -31,10 +31,24 @@ export const Airplane = ({ isFlying, isCrashed }: AirplaneProps) => {
         <svg 
           width="48" 
           height="48" 
-          viewBox="0 0 48 48" 
+          viewBox="0 0 100 100" 
           fill="currentColor"
         >
-          <path d="M24 2L22 4v6l-8 4v4l8-2v6l-4 2v2l4-1 4 1v-2l-4-2v-6l8 2v-4l-8-4V4z" />
+          {/* Airplane body */}
+          <ellipse cx="50" cy="50" rx="8" ry="25" fill="currentColor" />
+          
+          {/* Main wings */}
+          <ellipse cx="50" cy="40" rx="35" ry="8" fill="currentColor" />
+          
+          {/* Tail wings */}
+          <ellipse cx="50" cy="70" rx="15" ry="5" fill="currentColor" />
+          
+          {/* Nose */}
+          <circle cx="50" cy="25" r="6" fill="currentColor" />
+          
+          {/* Wing tips */}
+          <circle cx="15" cy="40" r="3" fill="currentColor" />
+          <circle cx="85" cy="40" r="3" fill="currentColor" />
         </svg>
       </div>
 

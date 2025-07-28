@@ -104,7 +104,7 @@ export const useGame = () => {
     
     toast({
       title: "Aposta realizada!",
-      description: `R$ ${betAmount.toFixed(2)} apostado`,
+      description: `${betAmount.toFixed(2)} MZN apostado`,
     });
   }, [betAmount, balance, isFlying, isBetPlaced, toast]);
 
@@ -124,7 +124,7 @@ export const useGame = () => {
     
     toast({
       title: "Saque realizado!",
-      description: `Ganhou R$ ${profit.toFixed(2)} (${currentMultiplier.toFixed(2)}x)`,
+      description: `Ganhou ${profit.toFixed(2)} MZN (${currentMultiplier.toFixed(2)}x)`,
     });
   }, [isFlying, canCashOut, isBetPlaced, betAmount, currentMultiplier, toast]);
 
@@ -154,7 +154,7 @@ export const useGame = () => {
     
     toast({
       title: "Perdeu!",
-      description: `Perdeu R$ ${betAmount.toFixed(2)}`,
+      description: `Perdeu ${betAmount.toFixed(2)} MZN`,
       variant: "destructive"
     });
   }, [betAmount, toast]);
