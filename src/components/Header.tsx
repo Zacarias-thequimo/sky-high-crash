@@ -22,15 +22,23 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
         </div>
 
         {/* Multiplier History */}
-        <div className="flex items-center space-x-2 overflow-x-auto">
-          {multiplierHistory.slice(-15).map((multiplier, index) => (
-            <div
-              key={index}
-              className={`text-sm font-semibold px-2 py-1 rounded ${getMultiplierColor(multiplier)}`}
-            >
-              {multiplier.toFixed(2)}x
-            </div>
-          ))}
+        <div className="flex items-center space-x-1">
+          <span className="text-gray-400 text-sm mr-2">Últimas:</span>
+          <div className="flex space-x-1 overflow-x-auto">
+            {multiplierHistory.slice(-10).map((multiplier, index) => (
+              <div
+                key={index}
+                className={`text-xs font-bold px-2 py-1 rounded-md min-w-[45px] text-center ${
+                  multiplier < 2 ? 'bg-blue-500/20 text-blue-400' :
+                  multiplier < 5 ? 'bg-green-500/20 text-green-400' :
+                  multiplier < 10 ? 'bg-yellow-500/20 text-yellow-400' :
+                  'bg-red-500/20 text-red-400'
+                }`}
+              >
+                {multiplier.toFixed(2)}x
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Balance */}

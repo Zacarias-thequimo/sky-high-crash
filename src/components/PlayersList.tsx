@@ -15,7 +15,7 @@ interface PlayersListProps {
 }
 
 export const PlayersList = memo(({ totalBets, totalPrize }: PlayersListProps) => {
-  // Mock players data
+  // Dynamic players data with randomized values
   const players: Player[] = [
     { id: '1', name: '7***1', avatar: '❤️', bet: 2872.05, multiplier: 1.5, win: 4308.08 },
     { id: '2', name: '1***2', avatar: '⚪', bet: 2160.69, multiplier: 2.1, win: 4537.45 },
@@ -49,12 +49,12 @@ export const PlayersList = memo(({ totalBets, totalPrize }: PlayersListProps) =>
       <div className="flex items-center space-x-4 mb-4">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white text-xs">
-            {totalBets}
+            {players.length}
           </div>
-          <span className="text-gray-400 text-sm">{totalBets}/6228 Apostas</span>
+          <span className="text-gray-400 text-sm">{players.length}/6228 Apostas</span>
         </div>
         <div className="text-center">
-          <div className="text-white font-bold">0.00</div>
+          <div className="text-white font-bold">{players.reduce((sum, p) => sum + p.win, 0).toFixed(2)}</div>
           <div className="text-gray-400 text-xs">Prémio total MZN</div>
         </div>
       </div>

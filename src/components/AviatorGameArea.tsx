@@ -17,22 +17,32 @@ export const AviatorGameArea = memo(({
   canCashOut 
 }: AviatorGameAreaProps) => {
   const [showCrashEffect, setShowCrashEffect] = useState(false);
-  const [airplanePosition, setAirplanePosition] = useState({ x: 50, y: 300 });
-  const chartData = useRef<{ time: number; multiplier: number }[]>([]);
+  const [airplanePosition, setAirplanePosition] = useState({ x: 10, y: 85 });
+  const chartData = useRef<{ time: number; multiplier: number; x: number; y: number }[]>([]);
 
   useEffect(() => {
     if (isFlying) {
       const now = Date.now();
-      chartData.current.push({ time: now, multiplier: multiplier });
       
-      // Update airplane position based on multiplier
-      const progress = Math.min((multiplier - 1) * 20, 80);
-      setAirplanePosition({
-        x: 50 + progress * 4,
-        y: 300 - progress * 2
+      // Calculate airplane position based on multiplier (moving across screen)
+      const baseTime = chartData.current.length;
+      const xProgress = Math.min(baseTime * 1.5, 85); // Move across screen
+      const yProgress = Math.max(85 - (multiplier - 1) * 10, 5); // Move up based on multiplier
+      
+      const newPosition = {
+        x: 10 + xProgress,
+        y: yProgress
+      };
+      
+      setAirplanePosition(newPosition);
+      chartData.current.push({ 
+        time: now, 
+        multiplier: multiplier,
+        x: newPosition.x,
+        y: newPosition.y
       });
       
-      if (chartData.current.length > 100) {
+      if (chartData.current.length > 50) {
         chartData.current = chartData.current.slice(-50);
       }
     }
@@ -48,7 +58,7 @@ export const AviatorGameArea = memo(({
   useEffect(() => {
     if (!isFlying && !isCrashed) {
       chartData.current = [];
-      setAirplanePosition({ x: 50, y: 300 });
+      setAirplanePosition({ x: 10, y: 85 });
     }
   }, [isFlying, isCrashed]);
 
@@ -61,16 +71,16 @@ export const AviatorGameArea = memo(({
 
       {/* Airplane */}
       <div 
-        className="absolute transition-all duration-100 ease-linear z-10"
+        className="absolute transition-all duration-150 ease-out z-10"
         style={{
-          left: `${airplanePosition.x}px`,
-          top: `${airplanePosition.y}px`,
+          left: `${airplanePosition.x}%`,
+          top: `${airplanePosition.y}%`,
           transform: 'translate(-50%, -50%)'
         }}
       >
-        <div className={`text-4xl transition-all duration-300 ${
-          isFlying ? 'animate-bounce' : ''
-        } ${isCrashed ? 'animate-ping text-red-500' : 'text-white'}`}>
+        <div className={`text-3xl transition-all duration-300 ${
+          isCrashed ? 'animate-ping text-red-500' : 'text-blue-400'
+        }`} style={{ transform: isFlying ? 'rotate(15deg)' : 'rotate(0deg)' }}>
           ✈️
         </div>
       </div>

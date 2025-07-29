@@ -19,7 +19,7 @@ export const GameArea = memo(({
   canCashOut 
 }: GameAreaProps) => {
   const [showCrashEffect, setShowCrashEffect] = useState(false);
-  const chartData = useRef<{ time: number; multiplier: number }[]>([]);
+  const chartData = useRef<{ time: number; multiplier: number; x: number; y: number }[]>([]);
 
   // Throttle chart data updates for better performance
   const lastUpdateRef = useRef(0);
@@ -29,9 +29,16 @@ export const GameArea = memo(({
       const now = Date.now();
       // Throttle updates to every 100ms for better performance
       if (now - lastUpdateRef.current > 100) {
+        // Calculate position based on time and multiplier
+        const timeProgress = chartData.current.length * 1.5;
+        const xPos = Math.min(10 + timeProgress, 90);
+        const yPos = Math.max(85 - (multiplier - 1) * 8, 5);
+        
         chartData.current.push({ 
           time: now, 
-          multiplier: multiplier 
+          multiplier: multiplier,
+          x: xPos,
+          y: yPos
         });
         lastUpdateRef.current = now;
         
