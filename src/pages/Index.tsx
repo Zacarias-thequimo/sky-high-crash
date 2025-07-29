@@ -1,7 +1,8 @@
-import { GameArea } from '@/components/GameArea';
-import { BettingPanel } from '@/components/BettingPanel';
-import { MultiplierHistory } from '@/components/MultiplierHistory';
-import { GameStats } from '@/components/GameStats';
+import { useState } from 'react';
+import { Header } from '@/components/Header';
+import { PlayersList } from '@/components/PlayersList';
+import { AviatorGameArea } from '@/components/AviatorGameArea';
+import { DualBettingPanel } from '@/components/DualBettingPanel';
 import { useGame } from '@/hooks/useGame';
 
 const Index = () => {
@@ -9,81 +10,90 @@ const Index = () => {
     currentMultiplier,
     isFlying,
     isCrashed,
-    isWaitingForNextRound,
     balance,
-    betAmount,
-    setBetAmount,
-    isBetPlaced,
-    canCashOut,
     placeBet,
     cashOut,
     multiplierHistory,
     gameStats
   } = useGame();
 
+  const [bets, setBets] = useState({
+    panel1: { amount: 1.00, isPlaced: false, canCashOut: false },
+    panel2: { amount: 8.00, isPlaced: false, canCashOut: false }
+  });
+
+  const handlePlaceBet = (amount: number, panel: 1 | 2) => {
+    if (panel === 1) {
+      setBets(prev => ({
+        ...prev,
+        panel1: { ...prev.panel1, amount, isPlaced: true, canCashOut: true }
+      }));
+    } else {
+      setBets(prev => ({
+        ...prev,
+        panel2: { ...prev.panel2, amount, isPlaced: true, canCashOut: true }
+      }));
+    }
+    placeBet();
+  };
+
+  const handleCashOut = (panel: 1 | 2) => {
+    if (panel === 1) {
+      setBets(prev => ({
+        ...prev,
+        panel1: { ...prev.panel1, canCashOut: false }
+      }));
+    } else {
+      setBets(prev => ({
+        ...prev,
+        panel2: { ...prev.panel2, canCashOut: false }
+      }));
+    }
+    cashOut();
+  };
+
+  const canCashOut = bets.panel1.canCashOut || bets.panel2.canCashOut;
+
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6">
-        <div className="text-center">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent mb-2">
-            SkyCrash ✈️
-          </h1>
-          <p className="text-muted-foreground">
-            Saque antes do crash e multiplique seus ganhos!
-          </p>
-        </div>
-      </div>
-
-      {/* Main Game Layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Game Area - Takes most space */}
-        <div className="lg:col-span-3">
-          <GameArea
-            multiplier={currentMultiplier}
-            isFlying={isFlying}
-            isCrashed={isCrashed}
-            onCashOut={cashOut}
-            canCashOut={canCashOut && isBetPlaced}
+      <Header multiplierHistory={multiplierHistory} balance={balance} />
+      
+      {/* Main Layout */}
+      <div className="flex-1 flex">
+        {/* Left Sidebar - Players List */}
+        <div className="w-80 border-r border-gray-700">
+          <PlayersList 
+            totalBets={gameStats.totalBets}
+            totalPrize={0}
           />
         </div>
-
-        {/* Betting Panel */}
-        <div className="space-y-6">
-          <BettingPanel
-            balance={balance}
-            betAmount={betAmount}
-            setBetAmount={setBetAmount}
-            onPlaceBet={placeBet}
-            onCashOut={cashOut}
-            isFlying={isFlying}
-            isBetPlaced={isBetPlaced}
-            canCashOut={canCashOut}
-            currentMultiplier={currentMultiplier}
-            isCrashed={isCrashed}
-          />
-        </div>
-      </div>
-
-      {/* Bottom Section - Stats and History */}
-      <div className="max-w-7xl mx-auto mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Multiplier History */}
-        <MultiplierHistory history={multiplierHistory} />
         
-        {/* Game Statistics */}
-        <GameStats
-          totalBets={gameStats.totalBets}
-          totalWins={gameStats.totalWins}
-          totalLosses={gameStats.totalLosses}
-          biggestWin={gameStats.biggestWin}
-          currentStreak={gameStats.currentStreak}
-          isWinStreak={gameStats.isWinStreak}
-        />
-      </div>
-
-      {/* Footer */}
-      <div className="max-w-7xl mx-auto mt-8 text-center text-sm text-muted-foreground">
-        <p>SkyCrash v1.0 - Jogo responsável. Aposte com moderação.</p>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          {/* Game Area */}
+          <div className="flex-1 p-6">
+            <AviatorGameArea
+              multiplier={currentMultiplier}
+              isFlying={isFlying}
+              isCrashed={isCrashed}
+              onCashOut={() => handleCashOut(1)}
+              canCashOut={canCashOut}
+            />
+          </div>
+          
+          {/* Betting Panel */}
+          <div className="border-t border-gray-700 p-6">
+            <DualBettingPanel
+              balance={balance}
+              onPlaceBet={handlePlaceBet}
+              onCashOut={handleCashOut}
+              isFlying={isFlying}
+              currentMultiplier={currentMultiplier}
+              bets={bets}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
