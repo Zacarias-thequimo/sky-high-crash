@@ -14,16 +14,253 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      bets: {
+        Row: {
+          actual_win: number | null
+          amount: number
+          cash_out_multiplier: number | null
+          cashed_out_at: string | null
+          created_at: string | null
+          id: string
+          placed_at: string | null
+          potential_win: number | null
+          round_id: string
+          status: Database["public"]["Enums"]["bet_status"] | null
+          user_id: string
+        }
+        Insert: {
+          actual_win?: number | null
+          amount: number
+          cash_out_multiplier?: number | null
+          cashed_out_at?: string | null
+          created_at?: string | null
+          id?: string
+          placed_at?: string | null
+          potential_win?: number | null
+          round_id: string
+          status?: Database["public"]["Enums"]["bet_status"] | null
+          user_id: string
+        }
+        Update: {
+          actual_win?: number | null
+          amount?: number
+          cash_out_multiplier?: number | null
+          cashed_out_at?: string | null
+          created_at?: string | null
+          id?: string
+          placed_at?: string | null
+          potential_win?: number | null
+          round_id?: string
+          status?: Database["public"]["Enums"]["bet_status"] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bets_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "game_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_rounds: {
+        Row: {
+          crashed_at: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          multiplier: number
+          seed_hash: string
+          started_at: string | null
+        }
+        Insert: {
+          crashed_at?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          multiplier: number
+          seed_hash: string
+          started_at?: string | null
+        }
+        Update: {
+          crashed_at?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          multiplier?: number
+          seed_hash?: string
+          started_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          balance: number | null
+          country: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          email: string
+          full_name: string | null
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          kyc_documents: Json | null
+          kyc_status: Database["public"]["Enums"]["kyc_status"] | null
+          phone: string | null
+          total_bet: number | null
+          total_deposited: number | null
+          total_withdrawn: number | null
+          total_won: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          balance?: number | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          kyc_documents?: Json | null
+          kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
+          phone?: string | null
+          total_bet?: number | null
+          total_deposited?: number | null
+          total_withdrawn?: number | null
+          total_won?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          balance?: number | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          kyc_documents?: Json | null
+          kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
+          phone?: string | null
+          total_bet?: number | null
+          total_deposited?: number | null
+          total_withdrawn?: number | null
+          total_won?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          external_transaction_id: string | null
+          id: string
+          metadata: Json | null
+          payment_provider: string | null
+          status: Database["public"]["Enums"]["transaction_status"] | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          external_transaction_id?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_provider?: string | null
+          status?: Database["public"]["Enums"]["transaction_status"] | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          external_transaction_id?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_provider?: string | null
+          status?: Database["public"]["Enums"]["transaction_status"] | null
+          type?: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      log_audit_event: {
+        Args: {
+          p_user_id: string
+          p_action: string
+          p_table_name?: string
+          p_record_id?: string
+          p_old_values?: Json
+          p_new_values?: Json
+        }
+        Returns: string
+      }
+      update_user_balance: {
+        Args: { p_user_id: string; p_amount: number; p_operation: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      bet_status: "active" | "won" | "lost" | "cancelled"
+      kyc_status: "pending" | "approved" | "rejected" | "not_submitted"
+      transaction_status: "pending" | "completed" | "failed" | "cancelled"
+      transaction_type: "deposit" | "withdrawal" | "bet" | "win" | "loss"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +387,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      bet_status: ["active", "won", "lost", "cancelled"],
+      kyc_status: ["pending", "approved", "rejected", "not_submitted"],
+      transaction_status: ["pending", "completed", "failed", "cancelled"],
+      transaction_type: ["deposit", "withdrawal", "bet", "win", "loss"],
+    },
   },
 } as const
