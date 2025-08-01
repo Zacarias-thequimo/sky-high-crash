@@ -6,22 +6,22 @@ interface MultiplierHistoryProps {
 
 export const MultiplierHistory = memo(({ history }: MultiplierHistoryProps) => {
   const getMultiplierColor = (multiplier: number) => {
-    if (multiplier < 2) return 'bg-multiplier-low text-primary-foreground';
-    if (multiplier < 10) return 'bg-multiplier-mid text-primary-foreground';
+    if (multiplier >= 1.00 && multiplier <= 2.00) return 'bg-multiplier-low text-primary-foreground';
+    if (multiplier >= 3.00 && multiplier <= 9.99) return 'bg-multiplier-mid text-primary-foreground';
     return 'bg-multiplier-high text-primary-foreground';
   };
 
   const getMultiplierLabel = (multiplier: number) => {
-    if (multiplier < 2) return 'Baixo';
-    if (multiplier < 10) return 'Médio';
-    return 'Alto';
+    if (multiplier >= 1.00 && multiplier <= 2.00) return 'Azul';
+    if (multiplier >= 3.00 && multiplier <= 9.99) return 'Roxo';
+    return 'Rosa';
   };
 
   // Memoize calculations for better performance
   const historyStats = useMemo(() => {
-    const lowCount = history.filter(m => m < 2).length;
-    const midCount = history.filter(m => m >= 2 && m < 10).length;
-    const highCount = history.filter(m => m >= 10).length;
+    const lowCount = history.filter(m => m >= 1.00 && m <= 2.00).length;
+    const midCount = history.filter(m => m >= 3.00 && m <= 9.99).length;
+    const highCount = history.filter(m => m >= 10.00).length;
     const displayHistory = history.slice(-20).reverse();
     
     return { lowCount, midCount, highCount, displayHistory };
@@ -43,11 +43,11 @@ export const MultiplierHistory = memo(({ history }: MultiplierHistoryProps) => {
           <div className="grid grid-cols-3 gap-2 text-xs text-center mb-4">
             <div className="flex items-center justify-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-multiplier-low"></div>
-              <span>1.00x - 1.99x</span>
+              <span>1.00x - 2.00x</span>
             </div>
             <div className="flex items-center justify-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-multiplier-mid"></div>
-              <span>2.00x - 9.99x</span>
+              <span>3.00x - 9.99x</span>
             </div>
             <div className="flex items-center justify-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-multiplier-high"></div>
@@ -84,19 +84,19 @@ export const MultiplierHistory = memo(({ history }: MultiplierHistoryProps) => {
               <div className="text-2xl font-bold text-multiplier-low">
                 {historyStats.lowCount}
               </div>
-              <div className="text-xs text-muted-foreground">Baixos</div>
+              <div className="text-xs text-muted-foreground">Azuis</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-multiplier-mid">
                 {historyStats.midCount}
               </div>
-              <div className="text-xs text-muted-foreground">Médios</div>
+              <div className="text-xs text-muted-foreground">Roxos</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-multiplier-high">
                 {historyStats.highCount}
               </div>
-              <div className="text-xs text-muted-foreground">Altos</div>
+              <div className="text-xs text-muted-foreground">Rosas</div>
             </div>
           </div>
         </div>

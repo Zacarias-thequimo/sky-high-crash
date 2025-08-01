@@ -7,10 +7,15 @@ interface HeaderProps {
 
 export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
   const getMultiplierColor = (value: number) => {
-    if (value < 2) return 'text-blue-400';
-    if (value < 5) return 'text-green-400';
-    if (value < 10) return 'text-yellow-400';
-    return 'text-red-400';
+    if (value >= 1.00 && value <= 2.00) return 'text-multiplier-low';
+    if (value >= 3.00 && value <= 9.99) return 'text-multiplier-mid';
+    return 'text-multiplier-high';
+  };
+
+  const getMultiplierBgColor = (value: number) => {
+    if (value >= 1.00 && value <= 2.00) return 'bg-multiplier-low/20';
+    if (value >= 3.00 && value <= 9.99) return 'bg-multiplier-mid/20';
+    return 'bg-multiplier-high/20';
   };
 
   return (
@@ -28,12 +33,9 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
             {multiplierHistory.slice(-10).map((multiplier, index) => (
               <div
                 key={index}
-                className={`text-xs font-bold px-2 py-1 rounded-md min-w-[45px] text-center ${
-                  multiplier < 2 ? 'bg-blue-500/20 text-blue-400' :
-                  multiplier < 5 ? 'bg-green-500/20 text-green-400' :
-                  multiplier < 10 ? 'bg-yellow-500/20 text-yellow-400' :
-                  'bg-red-500/20 text-red-400'
-                }`}
+                className={`text-xs font-bold px-2 py-1 rounded-md min-w-[45px] text-center transition-all duration-300 ${
+                  getMultiplierColor(multiplier)
+                } ${getMultiplierBgColor(multiplier)}`}
               >
                 {multiplier.toFixed(2)}x
               </div>

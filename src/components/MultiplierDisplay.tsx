@@ -12,8 +12,8 @@ export const MultiplierDisplay = memo(({
   isCrashed 
 }: MultiplierDisplayProps) => {
   const getMultiplierColor = (value: number) => {
-    if (value < 2) return 'multiplier-low';
-    if (value < 10) return 'multiplier-mid';
+    if (value >= 1.00 && value <= 2.00) return 'multiplier-low';
+    if (value >= 3.00 && value <= 9.99) return 'multiplier-mid';
     return 'multiplier-high';
   };
 

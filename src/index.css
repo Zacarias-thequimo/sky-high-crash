@@ -43,9 +43,9 @@
     --crash: 0 75% 60%;
     --profit: 120 75% 55%;
     --waiting: 45 95% 60%;
-    --multiplier-low: 217 91% 60%;
-    --multiplier-mid: 270 75% 65%;
-    --multiplier-high: 300 85% 70%;
+    --multiplier-low: 217 91% 60%;    /* 1.00-2.00: Azul */
+    --multiplier-mid: 270 75% 65%;    /* 3.00-9.99: Roxo */
+    --multiplier-high: 330 85% 70%;   /* 10.00+: Rosa */
 
     --border: 220 15% 25%;
     --input: 220 15% 18%;
