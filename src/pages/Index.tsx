@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { PlayersList } from '@/components/PlayersList';
 import { AviatorGameArea } from '@/components/AviatorGameArea';
 import { DualBettingPanel } from '@/components/DualBettingPanel';
 import { useGame } from '@/hooks/useGame';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, profile, loading, signOut } = useAuth();
+  
   const {
     currentMultiplier,
     isFlying,
@@ -21,6 +27,13 @@ const Index = () => {
     panel1: { amount: 1.00, isPlaced: false, canCashOut: false },
     panel2: { amount: 8.00, isPlaced: false, canCashOut: false }
   });
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
 
   const handlePlaceBet = (amount: number, panel: 1 | 2) => {
     if (panel === 1) {

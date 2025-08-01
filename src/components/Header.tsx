@@ -1,4 +1,6 @@
 import { memo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
   multiplierHistory: number[];
@@ -6,6 +8,8 @@ interface HeaderProps {
 }
 
 export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
+  const { user, profile, signOut } = useAuth();
+  
   const getMultiplierColor = (value: number) => {
     if (value >= 1.00 && value <= 2.00) return 'text-multiplier-low';
     if (value >= 3.00 && value <= 9.99) return 'text-multiplier-mid';
@@ -43,14 +47,23 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
           </div>
         </div>
 
-        {/* Balance */}
+        {/* User Info & Balance */}
         <div className="flex items-center space-x-4">
           <div className="text-green-400 font-bold">
-            {balance.toFixed(2)} MZN
+            {(profile?.balance || balance).toFixed(2)} MZN
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
-            <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
+            <span className="text-gray-300 text-sm">
+              {profile?.full_name || user?.email || 'Usuário'}
+            </span>
+            <Button
+              onClick={signOut}
+              variant="outline"
+              size="sm"
+              className="text-gray-300 border-gray-600 hover:bg-gray-700"
+            >
+              Sair
+            </Button>
           </div>
         </div>
       </div>
