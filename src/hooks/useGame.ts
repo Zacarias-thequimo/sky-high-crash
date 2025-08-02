@@ -62,10 +62,10 @@ export const useGame = () => {
         handleLoss();
       }
       
-      // Start next round after delay
+      // Start next round after delay (10 seconds)
       setTimeout(() => {
         startNextRound();
-      }, 3000);
+      }, 10000);
     }
   }), []); // Empty dependency array since callbacks are stable
 
@@ -83,10 +83,10 @@ export const useGame = () => {
     setCashOutMultiplier(0);
     setCurrentMultiplier(1.0);
     
-    // Start game after delay
+    // Start game after delay (10 seconds)
     setTimeout(() => {
       gameEngine.startGame();
-    }, 3000);
+    }, 10000);
   }, [gameEngine]);
 
   const placeBet = useCallback(() => {

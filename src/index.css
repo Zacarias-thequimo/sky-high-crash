@@ -90,7 +90,7 @@
   }
   
   .btn-cashout {
-    @apply bg-warning text-warning-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-warning/90 hover:shadow-lg hover:scale-105 active:scale-95;
+    @apply bg-warning text-warning-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-warning/90 hover:shadow-lg hover:scale-105 active:scale-95 animate-pulse;
   }
   
   .btn-crashed {

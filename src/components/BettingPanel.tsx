@@ -50,7 +50,8 @@ export const BettingPanel = ({
       return 'PERDEU';
     }
     if (isFlying && isBetPlaced && canCashOut) {
-      return `SACAR ${currentMultiplier.toFixed(2)}x`;
+      const potentialWin = (betAmount * currentMultiplier).toFixed(2);
+      return `SACAR ${potentialWin} MZN`;
     }
     if (isFlying && isBetPlaced && !canCashOut) {
       return 'SACOU!';
