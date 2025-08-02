@@ -125,7 +125,7 @@ export class GameEngine {
     const elapsed = Date.now() - this.gameStartTime;
     
     // Calculate multiplier based on elapsed time with optimized formula
-    const increment = (elapsed / 1000) * 0.08; // Slightly faster for better feel
+    const increment = (elapsed / 1000) * 0.15; // Faster multiplier growth
     this.currentMultiplier = 1.0 + increment;
 
     this.callbacks.onMultiplierUpdate?.(this.currentMultiplier);
