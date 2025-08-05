@@ -167,4 +167,26 @@
   .multiplier-high {
     @apply text-multiplier-high;
   }
+
+  /* Scrolling Animation for Multiplier Reel */
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100px);
+    }
+  }
+
+  .animate-scroll {
+    animation: scroll 20s linear infinite;
+  }
+
+  /* Enhanced casino-style gradients */
+  .casino-bg {
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(var(--card)) 50%, 
+      hsl(var(--background)) 100%);
+  }
 }

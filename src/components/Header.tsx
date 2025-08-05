@@ -23,50 +23,37 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
   };
 
   return (
-    <div className="bg-gray-900/95 border-b border-gray-700 px-6 py-3">
+    <header className="bg-background border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center space-x-3">
-          <h1 className="text-2xl font-bold text-red-500">Aviator</h1>
-        </div>
-
-        {/* Multiplier History */}
-        <div className="flex items-center space-x-1">
-          <span className="text-gray-400 text-sm mr-2">Últimas:</span>
-          <div className="flex space-x-1 overflow-x-auto">
-            {multiplierHistory.slice(-10).map((multiplier, index) => (
-              <div
-                key={index}
-                className={`text-xs font-bold px-2 py-1 rounded-md min-w-[45px] text-center transition-all duration-300 ${
-                  getMultiplierColor(multiplier)
-                } ${getMultiplierBgColor(multiplier)}`}
-              >
-                {multiplier.toFixed(2)}x
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center">
+          <h1 className="text-3xl font-black text-destructive tracking-wider">AVIATOR</h1>
         </div>
 
         {/* User Info & Balance */}
-        <div className="flex items-center space-x-4">
-          <div className="text-green-400 font-bold">
-            {(profile?.balance || balance).toFixed(2)} MZN
-          </div>
+        <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
-            <span className="text-gray-300 text-sm">
-              {profile?.full_name || user?.email || 'Usuário'}
+            <span className="text-muted-foreground text-sm">
+              {profile?.full_name || user?.phone || 'Usuário'}
             </span>
-            <Button
-              onClick={signOut}
-              variant="outline"
-              size="sm"
-              className="text-gray-300 border-gray-600 hover:bg-gray-700"
-            >
-              Sair
-            </Button>
           </div>
+          
+          <div className="bg-success/20 border border-success/30 rounded-lg px-4 py-2">
+            <div className="text-success font-bold text-lg">
+              {(profile?.balance || balance).toFixed(2)} MZN
+            </div>
+          </div>
+          
+          <Button
+            onClick={signOut}
+            variant="outline"
+            size="sm"
+            className="border-border hover:bg-secondary"
+          >
+            Sair
+          </Button>
         </div>
       </div>
-    </div>
+    </header>
   );
 });

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { PlayersList } from '@/components/PlayersList';
 import { AviatorGameArea } from '@/components/AviatorGameArea';
-import { DualBettingPanel } from '@/components/DualBettingPanel';
+import { MultiplierReel } from '@/components/MultiplierReel';
+import { ActiveBetsTable } from '@/components/ActiveBetsTable';
+import { EnhancedBettingPanel } from '@/components/EnhancedBettingPanel';
+import { BettingProgressBar } from '@/components/BettingProgressBar';
+import { GameFooter } from '@/components/GameFooter';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -68,24 +70,26 @@ const Index = () => {
   const canCashOut = bets.panel1.canCashOut || bets.panel2.canCashOut;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header */}
       <Header multiplierHistory={multiplierHistory} balance={balance} />
       
+      {/* Multiplier Reel */}
+      <div className="px-6 py-4">
+        <MultiplierReel multiplierHistory={multiplierHistory} />
+      </div>
+      
       {/* Main Layout */}
-      <div className="flex-1 flex">
-        {/* Left Sidebar - Players List */}
-        <div className="w-80 border-r border-gray-700">
-          <PlayersList 
-            totalBets={gameStats.totalBets}
-            totalPrize={0}
-          />
+      <div className="flex-1 flex gap-6 px-6">
+        {/* Left Sidebar - Active Bets */}
+        <div className="w-80">
+          <ActiveBetsTable bets={[]} currentMultiplier={currentMultiplier} />
         </div>
         
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col space-y-6">
           {/* Game Area */}
-          <div className="flex-1 p-6">
+          <div className="flex-1">
             <AviatorGameArea
               multiplier={currentMultiplier}
               isFlying={isFlying}
@@ -95,19 +99,25 @@ const Index = () => {
             />
           </div>
           
-          {/* Betting Panel */}
-          <div className="border-t border-gray-700 p-6">
-            <DualBettingPanel
-              balance={balance}
-              onPlaceBet={handlePlaceBet}
-              onCashOut={handleCashOut}
-              isFlying={isFlying}
-              currentMultiplier={currentMultiplier}
-              bets={bets}
-            />
-          </div>
+          {/* Progress Bar */}
+          <BettingProgressBar currentBets={2395} totalBets={6091} />
         </div>
       </div>
+      
+      {/* Betting Panel */}
+      <div className="border-t border-border px-6 py-6">
+        <EnhancedBettingPanel
+          balance={balance}
+          onPlaceBet={handlePlaceBet}
+          onCashOut={handleCashOut}
+          isFlying={isFlying}
+          currentMultiplier={currentMultiplier}
+          bets={bets}
+        />
+      </div>
+      
+      {/* Footer */}
+      <GameFooter />
     </div>
   );
 };
