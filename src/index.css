@@ -97,16 +97,22 @@
 }
 
 @layer components {
+  /* Transition Classes */
+  .transition-glow {
+    transition: var(--transition-glow);
+  }
+
   /* Aviator Button Variants */
   .btn-aviator {
     @apply font-bold text-sm uppercase tracking-wider transition-all duration-300;
   }
   
   .btn-bet {
-    @apply btn-aviator px-8 py-4 rounded-lg transition-glow;
+    @apply btn-aviator px-8 py-4 rounded-lg;
     background: var(--gradient-success);
     color: hsl(var(--success-foreground));
     box-shadow: var(--shadow-success);
+    transition: var(--transition-glow);
   }
   
   .btn-bet:hover {
@@ -115,10 +121,11 @@
   }
   
   .btn-cashout {
-    @apply btn-aviator px-8 py-4 rounded-lg animate-pulse transition-glow;
+    @apply btn-aviator px-8 py-4 rounded-lg animate-pulse;
     background: var(--gradient-action);
     color: hsl(var(--action-foreground));
     box-shadow: var(--shadow-action);
+    transition: var(--transition-glow);
   }
   
   .btn-cashout:hover {
