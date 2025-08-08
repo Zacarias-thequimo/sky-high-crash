@@ -18,17 +18,17 @@ export const MultiplierDisplay = memo(({
   };
 
   const getDisplayClass = () => {
-    let baseClass = 'multiplier-display transition-all duration-300';
+    let baseClass = 'multiplier-display transition-all duration-500 pulse-glow';
     
     if (isCrashed) {
-      return `${baseClass} text-crash animate-crash-shake`;
+      return `${baseClass} crash-effect`;
     }
     
     if (isFlying) {
-      return `${baseClass} text-${getMultiplierColor(multiplier)} glow-neon`;
+      return `${baseClass} glow-primary`;
     }
     
-    return `${baseClass} text-muted-foreground`;
+    return `${baseClass} opacity-60`;
   };
 
   return (
@@ -38,14 +38,14 @@ export const MultiplierDisplay = memo(({
       </div>
       
       {isFlying && (
-        <div className="text-sm text-muted-foreground mt-2 animate-pulse">
-          Voando...
+        <div className="text-lg text-digital mt-4 animate-pulse glow-primary" style={{ color: 'hsl(var(--success))' }}>
+          VOANDO...
         </div>
       )}
       
       {isCrashed && (
-        <div className="text-sm text-crash/80 mt-2">
-          Crashed!
+        <div className="text-xl text-digital mt-4 glow-action" style={{ color: 'hsl(var(--action))' }}>
+          VOOU!
         </div>
       )}
     </div>

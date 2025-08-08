@@ -68,14 +68,14 @@ const Index = () => {
   const canCashOut = bets.panel1.canCashOut || bets.panel2.canCashOut;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="min-h-screen text-foreground flex flex-col" style={{ background: 'var(--background-gradient)' }}>
       {/* Header */}
       <Header multiplierHistory={multiplierHistory} balance={balance} />
       
       {/* Main Layout */}
       <div className="flex-1 flex">
         {/* Left Sidebar - Players List */}
-        <div className="w-80 border-r border-gray-700">
+        <div className="w-80 border-r border-border">
           <PlayersList 
             totalBets={gameStats.totalBets}
             totalPrize={0}
@@ -96,7 +96,7 @@ const Index = () => {
           </div>
           
           {/* Betting Panel */}
-          <div className="border-t border-gray-700 p-6">
+          <div className="border-t border-border p-6">
             <DualBettingPanel
               balance={balance}
               onPlaceBet={handlePlaceBet}
