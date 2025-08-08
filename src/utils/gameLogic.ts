@@ -25,27 +25,29 @@ export function gerarMultiplicadores(lotes: number = 5): number[] {
 
     const lote: number[] = [];
 
-    // Garantir que 7 multiplicadores sejam menores que 3
-    const multiplicadoresBaixos = 7;
-    for (let j = 0; j < multiplicadoresBaixos && j < jogadas; j++) {
-      const baixo = Number((Math.random() * 1.99 + 1).toFixed(2)); // 1.00x a 2.99x
-      lote.push(baixo);
-    }
-
-    // Inserir 2 multiplicadores altos (rosa) se ainda há espaço
-    for (let j = 0; j < 2 && lote.length < jogadas; j++) {
+    // Inserir 2 multiplicadores altos (rosa)
+    for (let j = 0; j < 2 && j < jogadas; j++) {
       const alto = Number((Math.random() * 90 + 10).toFixed(2)); // 10x a 100x
       lote.push(alto);
     }
 
-    // Inserir o restante com roxo se ainda há espaço
-    for (let j = lote.length; j < jogadas; j++) {
-      // Roxo (5.00x - 9.99x)
-      const valor = Number((Math.random() * 4.99 + 5).toFixed(2));
+    // Inserir o restante com azul/roxo
+    for (let j = 0; j < jogadas - 2; j++) {
+      const chance = Math.random();
+      let valor;
+
+      if (chance < 0.6) {
+        // 60% de chance de ser azul (1.00x - 4.99x)
+        valor = Number((Math.random() * 3.99 + 1).toFixed(2));
+      } else {
+        // 40% de chance de ser roxo (5.00x - 9.99x)
+        valor = Number((Math.random() * 4.99 + 5).toFixed(2));
+      }
+
       lote.push(valor);
     }
 
-    // Embaralhar o lote para não deixar os baixos previsíveis
+    // Embaralhar o lote para não deixar os rosas previsíveis
     shuffleArray(lote);
 
     // Adiciona ao resultado final
