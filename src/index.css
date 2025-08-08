@@ -241,4 +241,56 @@
   .multiplier-high {
     @apply text-multiplier-high;
   }
+
+  /* Enhanced Airplane Styling */
+  .airplane-container {
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  .airplane-flying-glow {
+    filter: drop-shadow(0 0 15px hsl(var(--primary) / 0.8)) drop-shadow(0 0 25px hsl(var(--primary) / 0.4));
+    animation: airplane-thruster 0.3s ease-in-out infinite alternate;
+  }
+
+  .airplane-idle {
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+    opacity: 0.8;
+  }
+
+  .airplane-crashed {
+    filter: drop-shadow(0 0 20px hsl(var(--destructive) / 0.9)) hue-rotate(15deg) saturate(1.5);
+    animation: airplane-crash-shake 0.2s ease-in-out infinite;
+  }
+
+  .golden-trail-particle {
+    animation: trail-fade 0.6s ease-out infinite;
+  }
+
+  /* Airplane Animations */
+  @keyframes airplane-thruster {
+    0% {
+      filter: drop-shadow(0 0 15px hsl(var(--primary) / 0.8)) drop-shadow(0 0 25px hsl(var(--primary) / 0.4));
+    }
+    100% {
+      filter: drop-shadow(0 0 20px hsl(var(--primary) / 1)) drop-shadow(0 0 35px hsl(var(--primary) / 0.6));
+    }
+  }
+
+  @keyframes airplane-crash-shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-2px) rotate(-1deg); }
+    75% { transform: translateX(2px) rotate(1deg); }
+  }
+
+  @keyframes trail-fade {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
 }
