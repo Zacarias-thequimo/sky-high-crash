@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ const Auth = () => {
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          phone,
+          email,
           password,
         });
 
@@ -36,9 +36,10 @@ const Auth = () => {
         navigate('/');
       } else {
         const { error } = await supabase.auth.signUp({
-          phone,
+          email,
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               full_name: fullName,
             }
@@ -49,9 +50,8 @@ const Auth = () => {
 
         toast({
           title: "Conta criada com sucesso!",
-          description: "Você pode fazer login agora",
+          description: "Verifique seu email para confirmar a conta",
         });
-        setIsLogin(true);
       }
     } catch (error: any) {
       toast({
@@ -95,15 +95,15 @@ const Auth = () => {
             
             <div>
               <label className="text-sm font-medium text-gray-300">
-                Telefone
+                Email
               </label>
               <Input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="mt-1 bg-gray-700 border-gray-600 text-white"
-                placeholder="+258 84 123 4567"
+                placeholder="seu@email.com"
               />
             </div>
 
