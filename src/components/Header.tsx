@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Plane } from 'lucide-react';
 
 interface HeaderProps {
   multiplierHistory: number[];
@@ -24,32 +23,23 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
   };
 
   return (
-    <div className="card-aviator border-b border-border px-6 py-4">
+    <div className="bg-gray-900/95 border-b border-gray-700 px-6 py-3">
       <div className="flex items-center justify-between">
-        {/* Logo Aviator */}
+        {/* Logo */}
         <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
-            <Plane className="h-8 w-8 glow-primary" style={{ color: 'hsl(var(--primary))' }} />
-            <h1 className="text-3xl font-black text-digital" style={{ color: 'hsl(var(--action))' }}>
-              AVIATOR
-            </h1>
-          </div>
+          <h1 className="text-2xl font-bold text-red-500">Aviator</h1>
         </div>
 
         {/* Multiplier History */}
-        <div className="flex items-center space-x-2">
-          <span className="text-digital text-sm mr-3" style={{ color: 'hsl(var(--muted-foreground))' }}>ÚLTIMAS:</span>
+        <div className="flex items-center space-x-1">
+          <span className="text-gray-400 text-sm mr-2">Últimas:</span>
           <div className="flex space-x-1 overflow-x-auto">
             {multiplierHistory.slice(-10).map((multiplier, index) => (
               <div
                 key={index}
-                className={`text-xs font-bold px-3 py-2 rounded-lg min-w-[50px] text-center transition-all duration-300 glow-primary text-digital ${
+                className={`text-xs font-bold px-2 py-1 rounded-md min-w-[45px] text-center transition-all duration-300 ${
                   getMultiplierColor(multiplier)
                 } ${getMultiplierBgColor(multiplier)}`}
-                style={{
-                  background: `linear-gradient(135deg, hsl(var(--card)), hsl(var(--accent)))`,
-                  border: '1px solid hsl(var(--border))'
-                }}
               >
                 {multiplier.toFixed(2)}x
               </div>
@@ -58,23 +48,21 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
         </div>
 
         {/* User Info & Balance */}
-        <div className="flex items-center space-x-6">
-          <div className="text-right">
-            <div className="text-digital text-xl font-black glow-primary" style={{ color: 'hsl(var(--primary))' }}>
-              {(profile?.balance || balance).toFixed(2)} MZN
-            </div>
+        <div className="flex items-center space-x-4">
+          <div className="text-green-400 font-bold">
+            {(profile?.balance || balance).toFixed(2)} MZN
           </div>
-          <div className="flex items-center space-x-3">
-            <span className="text-digital text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              {profile?.full_name || user?.email || 'USUÁRIO'}
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-300 text-sm">
+              {profile?.full_name || user?.email || 'Usuário'}
             </span>
             <Button
               onClick={signOut}
               variant="outline"
               size="sm"
-              className="text-digital border-border hover:bg-accent"
+              className="text-gray-300 border-gray-600 hover:bg-gray-700"
             >
-              SAIR
+              Sair
             </Button>
           </div>
         </div>

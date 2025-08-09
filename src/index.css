@@ -2,95 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ultra-Modern Futuristic Casino Design System */
+/* SkyCrash Gaming Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
-    /* Deep Space Background - Black to Charcoal Gradient */
-    --background: 0 0% 3%;
-    --background-gradient: linear-gradient(145deg, hsl(0 0% 3%), hsl(220 8% 8%));
-    --background-diagonal: linear-gradient(45deg, hsl(0 0% 3%), hsl(220 8% 8%), hsl(240 5% 6%));
-    --foreground: 0 0% 98%;
+    /* Gaming Dark Theme */
+    --background: 220 15% 8%;
+    --foreground: 210 20% 95%;
 
-    /* Glassmorphism Cards */
-    --card: 220 8% 8%;
-    --card-glass: hsla(220, 8%, 12%, 0.25);
-    --card-foreground: 0 0% 98%;
-    --card-border: hsla(120, 100%, 65%, 0.1);
+    --card: 220 15% 12%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 220 8% 8%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 220 15% 12%;
+    --popover-foreground: 210 20% 95%;
 
-    /* Neon Golden Yellow Primary */
-    --primary: 50 100% 65%;
-    --primary-foreground: 0 0% 8%;
-    --primary-glow: 50 100% 75%;
-    --primary-neon: 50 100% 85%;
+    /* Neon Blue Primary */
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 15% 8%;
+    --primary-glow: 217 91% 70%;
 
-    /* Electric Neon Green */
-    --success: 120 100% 65%;
-    --success-foreground: 0 0% 8%;
-    --success-glow: 120 100% 75%;
-    --success-neon: 120 100% 85%;
-
-    /* Cinematic Orange-Red */
-    --action: 15 100% 62%;
-    --action-foreground: 0 0% 98%;
-    --action-glow: 15 100% 72%;
-    --action-neon: 15 100% 82%;
-
-    /* Sophisticated Secondary */
+    /* Gaming Secondary */
     --secondary: 220 15% 15%;
-    --secondary-foreground: 0 0% 85%;
+    --secondary-foreground: 210 20% 85%;
 
-    --muted: 220 12% 18%;
-    --muted-foreground: 0 0% 75%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 215 15% 65%;
 
-    --accent: 220 15% 22%;
-    --accent-foreground: 0 0% 92%;
+    --accent: 220 15% 20%;
+    --accent-foreground: 210 20% 90%;
 
-    /* High-Contrast Gaming Colors */
-    --warning: 45 100% 68%;
-    --warning-foreground: 0 0% 8%;
-    --destructive: 0 85% 65%;
-    --destructive-foreground: 0 0% 98%;
+    /* Gaming Colors */
+    --success: 120 75% 55%;
+    --success-foreground: 220 15% 8%;
+    --warning: 45 95% 60%;
+    --warning-foreground: 220 15% 8%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 210 20% 95%;
 
-    /* Enhanced Game States */
-    --crash: 0 85% 65%;
-    --profit: 120 100% 65%;
-    --waiting: 45 100% 68%;
-    --multiplier-low: 50 100% 65%;
-    --multiplier-mid: 280 85% 70%;
-    --multiplier-high: 330 90% 75%;
+    /* Game Specific */
+    --crash: 0 75% 60%;
+    --profit: 120 75% 55%;
+    --waiting: 45 95% 60%;
+    --multiplier-low: 217 91% 60%;    /* 1.00-2.00: Azul */
+    --multiplier-mid: 270 75% 65%;    /* 3.00-9.99: Roxo */
+    --multiplier-high: 330 85% 70%;   /* 10.00+: Rosa */
 
     --border: 220 15% 25%;
-    --input: 220 15% 15%;
-    --ring: 50 100% 65%;
+    --input: 220 15% 18%;
+    --ring: 217 91% 60%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    /* Cinematic Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--primary-neon)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)), hsl(var(--success-neon)));
-    --gradient-action: linear-gradient(135deg, hsl(var(--action)), hsl(var(--action-glow)), hsl(var(--action-neon)));
-    --gradient-glass: linear-gradient(145deg, hsla(220, 8%, 12%, 0.4), hsla(220, 15%, 18%, 0.2));
-    --gradient-gaming: linear-gradient(145deg, hsl(0 0% 3%), hsl(220 8% 8%), hsl(240 5% 6%));
-    --gradient-panel: linear-gradient(145deg, hsla(220, 8%, 10%, 0.8), hsla(220, 15%, 15%, 0.6));
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--accent)));
+    --gradient-gaming: linear-gradient(135deg, hsl(217 91% 60%), hsl(270 75% 65%));
     
-    /* Ultra-Modern Shadows & Glows */
-    --shadow-primary: 0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3);
-    --shadow-success: 0 0 30px hsl(var(--success) / 0.5), 0 0 60px hsl(var(--success) / 0.3);
-    --shadow-action: 0 0 30px hsl(var(--action) / 0.5), 0 0 60px hsl(var(--action) / 0.3);
-    --shadow-glass: 0 8px 32px hsla(0, 0%, 0%, 0.4), 0 0 0 1px hsla(255, 255%, 255%, 0.05);
-    --shadow-neon: 0 0 40px hsl(var(--success) / 0.8), 0 0 80px hsl(var(--success) / 0.4);
-    --shadow-cinematic: 0 25px 50px -12px hsla(0, 0%, 0%, 0.6);
-    --shadow-elevated: 0 10px 40px hsla(0, 0%, 0%, 0.3), 0 0 0 1px hsla(255, 255%, 255%, 0.08);
+    /* Shadows */
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    --shadow-neon: 0 0 30px hsl(var(--primary) / 0.5);
+    --shadow-card: 0 8px 32px hsl(220 15% 0% / 0.3);
     
-    /* Smooth Cinematic Animations */
-    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --transition-glow: all 0.6s ease-in-out;
-    --transition-glass: backdrop-filter 0.3s ease-in-out;
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -100,158 +75,45 @@
   }
 
   body {
-    @apply text-foreground font-sans antialiased;
-    background: var(--background-gradient);
-    font-family: 'Orbitron', 'Roboto Condensed', 'Inter', sans-serif;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 }
 
 @layer components {
-  /* Ultra-Modern Component System */
-  .transition-glow {
-    transition: var(--transition-glow);
-  }
-
-  .transition-glass {
-    transition: var(--transition-glass);
-  }
-
-  /* Futuristic Button System */
-  .btn-futuristic {
-    @apply font-bold text-sm uppercase tracking-wider relative overflow-hidden;
-    transition: var(--transition-smooth);
-    border-radius: var(--radius);
+  /* Gaming Button Variants */
+  .btn-game {
+    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-bold rounded-lg px-6 py-3 transition-all duration-300 hover:shadow-neon hover:scale-105 active:scale-95;
   }
   
   .btn-bet {
-    @apply btn-futuristic px-8 py-4;
-    background: var(--gradient-success);
-    color: hsl(var(--success-foreground));
-    box-shadow: var(--shadow-success);
-    border: 1px solid hsl(var(--success) / 0.5);
-  }
-  
-  .btn-bet:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: var(--shadow-neon);
-    filter: brightness(1.1);
+    @apply bg-success text-success-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-success/90 hover:shadow-lg hover:scale-105 active:scale-95;
   }
   
   .btn-cashout {
-    @apply btn-futuristic px-8 py-4 animate-pulse;
-    background: var(--gradient-action);
-    color: hsl(var(--action-foreground));
-    box-shadow: var(--shadow-action);
-    border: 1px solid hsl(var(--action) / 0.5);
-  }
-  
-  .btn-cashout:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 0 50px hsl(var(--action) / 1);
-    filter: brightness(1.2);
+    @apply bg-warning text-warning-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-warning/90 hover:shadow-lg hover:scale-105 active:scale-95 animate-pulse;
   }
   
   .btn-crashed {
-    @apply btn-futuristic px-8 py-4 cursor-not-allowed opacity-70;
-    background: linear-gradient(135deg, hsl(var(--crash)), hsl(var(--destructive)));
-    color: hsl(var(--destructive-foreground));
-    border: 1px solid hsl(var(--crash) / 0.5);
+    @apply bg-crash text-destructive-foreground font-bold rounded-lg px-8 py-4 cursor-not-allowed opacity-70;
   }
 
-  /* Glassmorphism Card System */
-  .card-glass {
-    background: var(--gradient-glass);
-    border: 1px solid hsla(255, 255%, 255%, 0.1);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow-glass);
-    backdrop-filter: blur(20px) saturate(180%);
-    position: relative;
+  /* Gaming Cards */
+  .card-game {
+    @apply bg-gradient-to-br from-card to-accent border border-border/50 rounded-xl p-6 shadow-card backdrop-blur-sm;
   }
 
-  .card-glass::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(145deg, hsla(255, 255%, 255%, 0.1), hsla(255, 255%, 255%, 0.05));
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-  }
-
-  .card-elevated {
-    background: var(--gradient-panel);
-    border: 1px solid hsla(255, 255%, 255%, 0.08);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow-elevated);
-    backdrop-filter: blur(16px) saturate(160%);
-  }
-
-  /* Ultra-Modern Multiplier Display */
+  /* Multiplier Display */
   .multiplier-display {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 5rem;
-    text-align: center;
-    letter-spacing: -0.02em;
-    text-shadow: 
-      0 0 20px hsl(var(--primary) / 0.8),
-      0 0 40px hsl(var(--primary) / 0.6),
-      0 0 60px hsl(var(--primary) / 0.4);
-    background: var(--gradient-primary);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.5));
-  }
-
-  .multiplier-display.crashed {
-    background: linear-gradient(135deg, hsl(var(--action)), hsl(var(--crash)));
-    background-clip: text;
-    -webkit-background-clip: text;
-    text-shadow: 
-      0 0 20px hsl(var(--action) / 0.8),
-      0 0 40px hsl(var(--action) / 0.6);
+    @apply text-6xl font-black bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent;
   }
 
   /* Glow Effects */
   .glow-primary {
-    box-shadow: var(--shadow-primary);
+    box-shadow: var(--shadow-glow);
   }
   
-  .glow-success {
-    box-shadow: var(--shadow-success);
-  }
-  
-  .glow-action {
-    box-shadow: var(--shadow-action);
-  }
-
-  /* Futuristic Typography */
-  .text-digital {
-    font-family: 'Orbitron', 'Roboto Condensed', monospace;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    text-shadow: 0 0 10px currentColor;
-  }
-
-  .text-number {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    text-shadow: 
-      0 0 10px currentColor,
-      0 2px 4px hsla(0, 0%, 0%, 0.8);
-  }
-
-  .text-neon {
-    text-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 15px currentColor,
-      0 0 20px currentColor;
+  .glow-neon {
+    box-shadow: var(--shadow-neon);
   }
 
   /* Airplane Animation */
@@ -304,57 +166,5 @@
   
   .multiplier-high {
     @apply text-multiplier-high;
-  }
-
-  /* Enhanced Airplane Styling */
-  .airplane-container {
-    position: relative;
-    transform-style: preserve-3d;
-  }
-
-  .airplane-flying-glow {
-    filter: drop-shadow(0 0 15px hsl(var(--primary) / 0.8)) drop-shadow(0 0 25px hsl(var(--primary) / 0.4));
-    animation: airplane-thruster 0.3s ease-in-out infinite alternate;
-  }
-
-  .airplane-idle {
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-    opacity: 0.8;
-  }
-
-  .airplane-crashed {
-    filter: drop-shadow(0 0 20px hsl(var(--destructive) / 0.9)) hue-rotate(15deg) saturate(1.5);
-    animation: airplane-crash-shake 0.2s ease-in-out infinite;
-  }
-
-  .golden-trail-particle {
-    animation: trail-fade 0.6s ease-out infinite;
-  }
-
-  /* Airplane Animations */
-  @keyframes airplane-thruster {
-    0% {
-      filter: drop-shadow(0 0 15px hsl(var(--primary) / 0.8)) drop-shadow(0 0 25px hsl(var(--primary) / 0.4));
-    }
-    100% {
-      filter: drop-shadow(0 0 20px hsl(var(--primary) / 1)) drop-shadow(0 0 35px hsl(var(--primary) / 0.6));
-    }
-  }
-
-  @keyframes airplane-crash-shake {
-    0%, 100% { transform: translateX(0) rotate(0deg); }
-    25% { transform: translateX(-2px) rotate(-1deg); }
-    75% { transform: translateX(2px) rotate(1deg); }
-  }
-
-  @keyframes trail-fade {
-    0% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(0.8);
-    }
   }
 }

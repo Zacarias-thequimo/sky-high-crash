@@ -59,64 +59,57 @@ export const DualBettingPanel = memo(({
     const isDisabled = isFlying && (!bet.isPlaced || !bet.canCashOut);
 
     return (
-      <div className="card-glass space-y-4 border-gradient"
-           style={{ 
-             borderImage: 'linear-gradient(145deg, hsla(120, 100%, 65%, 0.3), hsla(50, 100%, 65%, 0.2)) 1'
-           }}>
-        {/* Glassmorphism Mode Tabs */}
-        <div className="flex rounded-lg overflow-hidden bg-muted/30 backdrop-blur-sm border border-border/50">
+      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 space-y-4">
+        {/* Mode Tabs */}
+        <div className="flex rounded-lg overflow-hidden bg-gray-700/50">
           <button 
             onClick={() => setAutoMode(false)}
-            className={`flex-1 py-2 text-sm font-medium text-digital transition-all duration-300 ${
-              !autoMode 
-                ? 'bg-gradient-to-r from-primary/20 to-success/20 text-primary border-r border-primary/30 text-neon' 
-                : 'text-muted-foreground hover:text-foreground'
+            className={`flex-1 py-2 text-sm font-medium ${
+              !autoMode ? 'bg-gray-600 text-white' : 'text-gray-400'
             }`}
           >
-            APOSTA
+            Aposta
           </button>
           <button 
             onClick={() => setAutoMode(true)}
-            className={`flex-1 py-2 text-sm font-medium text-digital transition-all duration-300 ${
-              autoMode 
-                ? 'bg-gradient-to-r from-success/20 to-primary/20 text-success border-l border-success/30 text-neon' 
-                : 'text-muted-foreground hover:text-foreground'
+            className={`flex-1 py-2 text-sm font-medium ${
+              autoMode ? 'bg-gray-600 text-white' : 'text-gray-400'
             }`}
           >
-            AUTO
+            Automático
           </button>
         </div>
 
-        {/* Futuristic Bet Amount Controls */}
+        {/* Bet Amount Controls */}
         <div className="space-y-2">
-          <div className="flex items-center card-glass border border-primary/20 bg-muted/20">
+          <div className="flex items-center border border-gray-600 rounded bg-gray-700/50">
             <button 
               onClick={() => setBetAmount(Math.max(1, betAmount - 1))}
-              className="px-4 py-3 text-muted-foreground hover:text-primary transition-all duration-300 hover:bg-primary/10 text-digital font-bold disabled:opacity-50"
+              className="px-3 py-2 text-gray-400 hover:text-white"
               disabled={isFlying}
             >
               −
             </button>
-            <div className="flex-1 text-center py-3">
-              <div className="text-foreground font-bold text-digital text-number">{betAmount.toFixed(2)}</div>
+            <div className="flex-1 text-center py-2">
+              <div className="text-white font-bold">{betAmount.toFixed(2)}</div>
             </div>
             <button 
               onClick={() => setBetAmount(betAmount + 1)}
-              className="px-4 py-3 text-muted-foreground hover:text-primary transition-all duration-300 hover:bg-primary/10 text-digital font-bold disabled:opacity-50"
+              className="px-3 py-2 text-gray-400 hover:text-white"
               disabled={isFlying}
             >
               +
             </button>
           </div>
 
-          {/* Glassmorphism Quick Amount Buttons */}
-          <div className="grid grid-cols-4 gap-2">
+          {/* Quick Amount Buttons */}
+          <div className="grid grid-cols-4 gap-1">
             {quickAmounts.map((amount) => (
               <button
                 key={amount}
                 onClick={() => setBetAmount(amount)}
                 disabled={isFlying}
-                className="card-glass border border-success/20 hover:border-success/40 text-foreground text-xs py-2 px-2 font-medium text-digital transition-all duration-300 hover:bg-success/10 hover:text-success disabled:opacity-50 hover:scale-105"
+                className="bg-gray-700 hover:bg-gray-600 text-white text-xs py-1 px-2 rounded disabled:opacity-50"
               >
                 {amount}
               </button>
@@ -124,7 +117,7 @@ export const DualBettingPanel = memo(({
           </div>
         </div>
 
-        {/* Ultra-Modern Action Button */}
+        {/* Action Button */}
         <Button
           onClick={() => {
             if (isFlying && bet.canCashOut) {
@@ -134,21 +127,22 @@ export const DualBettingPanel = memo(({
             }
           }}
           disabled={isDisabled}
-          variant={isFlying && bet.canCashOut ? 'cashout' : 'bet'}
-          className={`w-full py-4 text-lg text-digital text-neon ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-full py-4 font-bold text-lg ${
+            isFlying && bet.canCashOut 
+              ? 'bg-orange-500 hover:bg-orange-600 text-white' 
+              : 'bg-green-500 hover:bg-green-600 text-white'
+          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {getButtonText()}
         </Button>
 
-        {/* Glassmorphism Bet Info */}
+        {/* Bet Info */}
         {bet.isPlaced && (
-          <div className="text-center text-sm card-glass border border-primary/20 py-3">
-            <div className="text-muted-foreground text-digital">
-              Aposta ativa: <span className="text-primary font-bold">{betAmount.toFixed(2)} MZN</span>
-            </div>
+          <div className="text-center text-sm text-gray-400">
+            Aposta ativa: {betAmount.toFixed(2)} MZN
             {isFlying && bet.canCashOut && (
-              <div className="text-success mt-1 text-neon text-digital">
-                Ganho potencial: <span className="font-bold">{(betAmount * currentMultiplier).toFixed(2)} MZN</span>
+              <div className="text-green-400 mt-1">
+                Ganho potencial: {(betAmount * currentMultiplier).toFixed(2)} MZN
               </div>
             )}
           </div>
