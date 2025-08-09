@@ -2,85 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Aviator Gaming Design System - All colors MUST be HSL */
+/* Ultra-Modern Futuristic Casino Design System */
 
 @layer base {
   :root {
-    /* Aviator Dark Theme - Gradiente escuro azulado */
-    --background: 210 20% 6%;
-    --background-gradient: linear-gradient(135deg, hsl(210 20% 6%), hsl(210 15% 10%));
-    --foreground: 0 0% 100%;
+    /* Deep Space Background - Black to Charcoal Gradient */
+    --background: 0 0% 3%;
+    --background-gradient: linear-gradient(145deg, hsl(0 0% 3%), hsl(220 8% 8%));
+    --background-diagonal: linear-gradient(45deg, hsl(0 0% 3%), hsl(220 8% 8%), hsl(240 5% 6%));
+    --foreground: 0 0% 98%;
 
-    --card: 210 20% 8%;
-    --card-foreground: 0 0% 100%;
+    /* Glassmorphism Cards */
+    --card: 220 8% 8%;
+    --card-glass: hsla(220, 8%, 12%, 0.25);
+    --card-foreground: 0 0% 98%;
+    --card-border: hsla(120, 100%, 65%, 0.1);
 
-    --popover: 210 20% 8%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 220 8% 8%;
+    --popover-foreground: 0 0% 98%;
 
-    /* Amarelo vibrante como primário */
-    --primary: 51 100% 50%;
-    --primary-foreground: 210 20% 6%;
-    --primary-glow: 51 100% 60%;
+    /* Neon Golden Yellow Primary */
+    --primary: 50 100% 65%;
+    --primary-foreground: 0 0% 8%;
+    --primary-glow: 50 100% 75%;
+    --primary-neon: 50 100% 85%;
 
-    /* Verde neon para apostas */
-    --success: 143 100% 55%;
-    --success-foreground: 210 20% 6%;
-    --success-glow: 143 100% 65%;
+    /* Electric Neon Green */
+    --success: 120 100% 65%;
+    --success-foreground: 0 0% 8%;
+    --success-glow: 120 100% 75%;
+    --success-neon: 120 100% 85%;
 
-    /* Vermelho alaranjado para botões principais */
-    --action: 11 100% 58%;
-    --action-foreground: 0 0% 100%;
-    --action-glow: 11 100% 68%;
+    /* Cinematic Orange-Red */
+    --action: 15 100% 62%;
+    --action-foreground: 0 0% 98%;
+    --action-glow: 15 100% 72%;
+    --action-neon: 15 100% 82%;
 
-    /* Gaming Secondary */
-    --secondary: 210 15% 12%;
-    --secondary-foreground: 0 0% 80%;
+    /* Sophisticated Secondary */
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 0 0% 85%;
 
-    --muted: 210 15% 15%;
-    --muted-foreground: 0 0% 80%;
+    --muted: 220 12% 18%;
+    --muted-foreground: 0 0% 75%;
 
-    --accent: 210 15% 20%;
-    --accent-foreground: 0 0% 90%;
+    --accent: 220 15% 22%;
+    --accent-foreground: 0 0% 92%;
 
-    /* Gaming Colors */
-    --warning: 45 95% 60%;
-    --warning-foreground: 210 20% 6%;
-    --destructive: 0 75% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* High-Contrast Gaming Colors */
+    --warning: 45 100% 68%;
+    --warning-foreground: 0 0% 8%;
+    --destructive: 0 85% 65%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Game Specific */
-    --crash: 0 75% 60%;
-    --profit: 143 100% 55%;
-    --waiting: 45 95% 60%;
-    --multiplier-low: 51 100% 50%;
-    --multiplier-mid: 280 75% 65%;
-    --multiplier-high: 330 85% 70%;
+    /* Enhanced Game States */
+    --crash: 0 85% 65%;
+    --profit: 120 100% 65%;
+    --waiting: 45 100% 68%;
+    --multiplier-low: 50 100% 65%;
+    --multiplier-mid: 280 85% 70%;
+    --multiplier-high: 330 90% 75%;
 
-    --border: 210 15% 25%;
-    --input: 210 15% 12%;
-    --ring: 51 100% 50%;
+    --border: 220 15% 25%;
+    --input: 220 15% 15%;
+    --ring: 50 100% 65%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)));
-    --gradient-action: linear-gradient(135deg, hsl(var(--action)), hsl(var(--action-glow)));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--accent)));
-    --gradient-gaming: linear-gradient(135deg, hsl(210 20% 6%), hsl(210 15% 10%));
+    /* Cinematic Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--primary-neon)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)), hsl(var(--success-neon)));
+    --gradient-action: linear-gradient(135deg, hsl(var(--action)), hsl(var(--action-glow)), hsl(var(--action-neon)));
+    --gradient-glass: linear-gradient(145deg, hsla(220, 8%, 12%, 0.4), hsla(220, 15%, 18%, 0.2));
+    --gradient-gaming: linear-gradient(145deg, hsl(0 0% 3%), hsl(220 8% 8%), hsl(240 5% 6%));
+    --gradient-panel: linear-gradient(145deg, hsla(220, 8%, 10%, 0.8), hsla(220, 15%, 15%, 0.6));
     
-    /* Shadows & Glows */
-    --shadow-primary: 0 0 20px hsl(var(--primary) / 0.4);
-    --shadow-success: 0 0 20px hsl(var(--success) / 0.4);
-    --shadow-action: 0 0 20px hsl(var(--action) / 0.4);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.6);
-    --shadow-neon: 0 0 40px hsl(var(--success) / 0.6);
-    --shadow-card: 0 8px 32px hsl(210 20% 0% / 0.5);
+    /* Ultra-Modern Shadows & Glows */
+    --shadow-primary: 0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3);
+    --shadow-success: 0 0 30px hsl(var(--success) / 0.5), 0 0 60px hsl(var(--success) / 0.3);
+    --shadow-action: 0 0 30px hsl(var(--action) / 0.5), 0 0 60px hsl(var(--action) / 0.3);
+    --shadow-glass: 0 8px 32px hsla(0, 0%, 0%, 0.4), 0 0 0 1px hsla(255, 255%, 255%, 0.05);
+    --shadow-neon: 0 0 40px hsl(var(--success) / 0.8), 0 0 80px hsl(var(--success) / 0.4);
+    --shadow-cinematic: 0 25px 50px -12px hsla(0, 0%, 0%, 0.6);
+    --shadow-elevated: 0 10px 40px hsla(0, 0%, 0%, 0.3), 0 0 0 1px hsla(255, 255%, 255%, 0.08);
     
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --transition-glow: all 0.4s ease-in-out;
+    /* Smooth Cinematic Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-glow: all 0.6s ease-in-out;
+    --transition-glass: backdrop-filter 0.3s ease-in-out;
   }
 }
 
@@ -97,70 +107,113 @@
 }
 
 @layer components {
-  /* Transition Classes */
+  /* Ultra-Modern Component System */
   .transition-glow {
     transition: var(--transition-glow);
   }
 
-  /* Aviator Button Variants */
-  .btn-aviator {
-    @apply font-bold text-sm uppercase tracking-wider transition-all duration-300;
+  .transition-glass {
+    transition: var(--transition-glass);
+  }
+
+  /* Futuristic Button System */
+  .btn-futuristic {
+    @apply font-bold text-sm uppercase tracking-wider relative overflow-hidden;
+    transition: var(--transition-smooth);
+    border-radius: var(--radius);
   }
   
   .btn-bet {
-    @apply btn-aviator px-8 py-4 rounded-lg;
+    @apply btn-futuristic px-8 py-4;
     background: var(--gradient-success);
     color: hsl(var(--success-foreground));
     box-shadow: var(--shadow-success);
-    transition: var(--transition-glow);
+    border: 1px solid hsl(var(--success) / 0.5);
   }
   
   .btn-bet:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px) scale(1.02);
     box-shadow: var(--shadow-neon);
+    filter: brightness(1.1);
   }
   
   .btn-cashout {
-    @apply btn-aviator px-8 py-4 rounded-lg animate-pulse;
+    @apply btn-futuristic px-8 py-4 animate-pulse;
     background: var(--gradient-action);
     color: hsl(var(--action-foreground));
     box-shadow: var(--shadow-action);
-    transition: var(--transition-glow);
+    border: 1px solid hsl(var(--action) / 0.5);
   }
   
   .btn-cashout:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 40px hsl(var(--action) / 0.8);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 50px hsl(var(--action) / 1);
+    filter: brightness(1.2);
   }
   
   .btn-crashed {
-    @apply btn-aviator px-8 py-4 rounded-lg cursor-not-allowed opacity-70;
-    background: hsl(var(--crash));
+    @apply btn-futuristic px-8 py-4 cursor-not-allowed opacity-70;
+    background: linear-gradient(135deg, hsl(var(--crash)), hsl(var(--destructive)));
     color: hsl(var(--destructive-foreground));
+    border: 1px solid hsl(var(--crash) / 0.5);
   }
 
-  /* Aviator Cards */
-  .card-aviator {
-    background: var(--gradient-card);
-    border: 1px solid hsl(var(--border));
-    border-radius: 12px;
+  /* Glassmorphism Card System */
+  .card-glass {
+    background: var(--gradient-glass);
+    border: 1px solid hsla(255, 255%, 255%, 0.1);
+    border-radius: var(--radius);
     padding: 24px;
-    box-shadow: var(--shadow-card);
-    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    position: relative;
   }
 
-  /* Multiplier Display */
+  .card-glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(145deg, hsla(255, 255%, 255%, 0.1), hsla(255, 255%, 255%, 0.05));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+
+  .card-elevated {
+    background: var(--gradient-panel);
+    border: 1px solid hsla(255, 255%, 255%, 0.08);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-elevated);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+
+  /* Ultra-Modern Multiplier Display */
   .multiplier-display {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    font-size: 4rem;
+    font-size: 5rem;
     text-align: center;
-    letter-spacing: -0.05em;
-    text-shadow: 0 0 20px hsl(var(--primary) / 0.6);
+    letter-spacing: -0.02em;
+    text-shadow: 
+      0 0 20px hsl(var(--primary) / 0.8),
+      0 0 40px hsl(var(--primary) / 0.6),
+      0 0 60px hsl(var(--primary) / 0.4);
     background: var(--gradient-primary);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.5));
+  }
+
+  .multiplier-display.crashed {
+    background: linear-gradient(135deg, hsl(var(--action)), hsl(var(--crash)));
+    background-clip: text;
+    -webkit-background-clip: text;
+    text-shadow: 
+      0 0 20px hsl(var(--action) / 0.8),
+      0 0 40px hsl(var(--action) / 0.6);
   }
 
   /* Glow Effects */
@@ -176,18 +229,29 @@
     box-shadow: var(--shadow-action);
   }
 
-  /* Digital Typography */
+  /* Futuristic Typography */
   .text-digital {
     font-family: 'Orbitron', 'Roboto Condensed', monospace;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 10px currentColor;
   }
 
   .text-number {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 
+      0 0 10px currentColor,
+      0 2px 4px hsla(0, 0%, 0%, 0.8);
+  }
+
+  .text-neon {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
   }
 
   /* Airplane Animation */

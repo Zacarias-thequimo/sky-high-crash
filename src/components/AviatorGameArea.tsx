@@ -63,7 +63,13 @@ export const AviatorGameArea = memo(({
   }, [isFlying, isCrashed]);
 
   return (
-    <div className="relative w-full h-96 bg-gray-900/95 border border-gray-700 rounded-lg overflow-hidden">
+    <div className="relative w-full h-96 card-glass overflow-hidden">
+      {/* Diagonal Light Streaks */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-transparent to-success/5 rotate-12 scale-150"></div>
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-bl from-success/5 via-transparent to-transparent"></div>
+      </div>
+
       {/* Game Chart Background */}
       <div className="absolute inset-0">
         <GameChart data={chartData.current} isFlying={isFlying} />
@@ -85,27 +91,32 @@ export const AviatorGameArea = memo(({
         </div>
       </div>
 
-      {/* Multiplier Display */}
+      {/* Ultra-Modern Multiplier Display */}
       <div className="absolute top-8 left-8 z-20">
-        <div className={`text-6xl font-black transition-all duration-300 ${
-          isCrashed ? 'text-red-500 animate-pulse' : 
-          isFlying ? 'text-green-400' : 'text-gray-400'
+        <div className={`multiplier-display transition-all duration-500 ${
+          isCrashed ? 'crashed crash-effect' : 
+          isFlying ? 'pulse-glow' : 'opacity-60'
         }`}>
           {multiplier.toFixed(2)}x
         </div>
         {isFlying && !isCrashed && (
-          <div className="text-sm text-gray-400 mt-2 animate-pulse">
-            Voando...
+          <div className="text-lg text-digital text-neon mt-4 animate-pulse" style={{ color: 'hsl(var(--success))' }}>
+            VOANDO...
+          </div>
+        )}
+        {isCrashed && (
+          <div className="text-xl text-digital text-neon mt-4" style={{ color: 'hsl(var(--action))' }}>
+            CRASHED!
           </div>
         )}
       </div>
 
-      {/* Cash Out Button */}
+      {/* Futuristic Cash Out Button */}
       {isFlying && canCashOut && (
         <div className="absolute top-8 right-8 z-20">
           <button 
             onClick={onCashOut}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg animate-pulse"
+            className="btn-cashout text-neon"
           >
             SACAR {multiplier.toFixed(2)}x
           </button>
@@ -140,15 +151,15 @@ export const AviatorGameArea = memo(({
         </div>
       )}
 
-      {/* Online Players Count */}
+      {/* Glassmorphism Players Count */}
       <div className="absolute bottom-4 right-4 z-20">
-        <div className="flex items-center space-x-2 bg-gray-800/80 px-3 py-1 rounded-full">
+        <div className="flex items-center space-x-2 card-glass px-4 py-2 border border-success/20">
           <div className="flex -space-x-2">
-            <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-gray-800"></div>
-            <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800"></div>
-            <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-gray-800"></div>
+            <div className="w-6 h-6 bg-gradient-to-br from-action to-crash rounded-full border-2 border-background shadow-sm shadow-action/50"></div>
+            <div className="w-6 h-6 bg-gradient-to-br from-success to-success-glow rounded-full border-2 border-background shadow-sm shadow-success/50"></div>
+            <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary-glow rounded-full border-2 border-background shadow-sm shadow-primary/50"></div>
           </div>
-          <span className="text-white text-sm font-medium">3,624</span>
+          <span className="text-foreground text-sm font-medium text-digital">3,624</span>
         </div>
       </div>
     </div>
