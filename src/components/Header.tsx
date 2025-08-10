@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-
+import { DepositButton } from '@/components/DepositButton';
 interface HeaderProps {
   multiplierHistory: number[];
   balance: number;
@@ -54,8 +54,9 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-gray-300 text-sm">
-              {profile?.full_name || user?.email || 'Usuário'}
+              {profile?.full_name || user?.phone || 'Usuário'}
             </span>
+            <DepositButton />
             <Button
               onClick={signOut}
               variant="outline"

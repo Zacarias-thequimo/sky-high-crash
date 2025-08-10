@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,9 +20,10 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      const normalizedPhone = phone.trim().startsWith('+') ? phone.trim() : `+258${phone.trim().replace(/\D/g, '')}`;
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          phone: normalizedPhone,
           password,
         });
 
@@ -36,10 +37,9 @@ const Auth = () => {
         navigate('/');
       } else {
         const { error } = await supabase.auth.signUp({
-          email,
+          phone: normalizedPhone,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
             data: {
               full_name: fullName,
             }
@@ -50,7 +50,7 @@ const Auth = () => {
 
         toast({
           title: "Conta criada com sucesso!",
-          description: "Verifique seu email para confirmar a conta",
+          description: "Verifique o SMS para confirmar a conta",
         });
       }
     } catch (error: any) {
@@ -95,15 +95,15 @@ const Auth = () => {
             
             <div>
               <label className="text-sm font-medium text-gray-300">
-                Email
+                Telefone
               </label>
               <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
                 className="mt-1 bg-gray-700 border-gray-600 text-white"
-                placeholder="seu@email.com"
+                placeholder="+25884xxxxxxx"
               />
             </div>
 
