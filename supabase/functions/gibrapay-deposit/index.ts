@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"; 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -17,53 +17,33 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client with service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { persistSession: false } }
     );
 
-    // Get user from auth header
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
+    if (!authHeader) throw new Error('No authorization header');
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-    
-    if (authError || !user) {
-      throw new Error('Invalid authentication');
-    }
+    if (authError || !user) throw new Error('Invalid authentication');
 
     const { amount, phone }: DepositRequest = await req.json();
+    if (!amount || amount < 10) throw new Error('Minimum deposit amount is 10 MZN');
+    if (amount > 100000) throw new Error('Maximum deposit amount is 100,000 MZN');
 
-    // Validate amount
-    if (!amount || amount < 10) {
-      throw new Error('Minimum deposit amount is 10 MZN');
-    }
-
-    if (amount > 100000) {
-      throw new Error('Maximum deposit amount is 100,000 MZN');
-    }
-
-    // Get user profile
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile) {
-      throw new Error('User profile not found');
-    }
+    if (profileError || !profile) throw new Error('User profile not found');
+    if (!profile.is_active) throw new Error('Account is inactive');
 
-    if (!profile.is_active) {
-      throw new Error('Account is inactive');
-    }
-
-    // Create transaction record as pending
+    // Criar registro de transação pendente
     const { data: transaction, error: transactionError } = await supabaseAdmin
       .from('transactions')
       .insert({
@@ -81,31 +61,41 @@ serve(async (req) => {
       .select()
       .single();
 
-    if (transactionError) {
-      throw new Error('Failed to create transaction record');
-    }
+    if (transactionError) throw new Error('Failed to create transaction record');
 
-    // TODO: Integrate with actual Gibrapay.online API
-    // For now, we'll simulate the API call
+    // Chamada oficial da API GibraPay (docs)
     const gibrapayApiKey = Deno.env.get('GIBRAPAY_API_KEY');
-    
-    if (!gibrapayApiKey) {
+    const gibrapayWalletId = Deno.env.get('GIBRAPAY_WALLET_ID');
+
+    if (!gibrapayApiKey || !gibrapayWalletId) {
       throw new Error('Gibrapay integration not configured');
     }
 
-    // Simulate Gibrapay API call
-    const gibrapayResponse = {
-      status: 'success',
-      transaction_id: `GP_${Date.now()}`,
-      payment_url: `https://gibrapay.online/pay/${transaction.id}`,
-      reference: transaction.id
-    };
+    const gibrapayRequest = await fetch("https://gibrapay.online/v1/transfer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "API-Key": gibrapayApiKey
+      },
+      body: JSON.stringify({
+        wallet_id: gibrapayWalletId,
+        amount: amount,
+        number_phone: phone || profile.phone
+      })
+    });
 
-    // Update transaction with external ID
+    const gibrapayResponse = await gibrapayRequest.json();
+
+    if (!gibrapayRequest.ok || gibrapayResponse.status !== 'success') {
+      throw new Error(`Gibrapay transfer failed: ${JSON.stringify(gibrapayResponse)}`);
+    }
+
+    // Atualizar transação com dados externos
     await supabaseAdmin
       .from('transactions')
       .update({
-        external_transaction_id: gibrapayResponse.transaction_id,
+        external_transaction_id: gibrapayResponse.transaction_id || null,
+        status: 'processing',
         metadata: {
           ...transaction.metadata,
           gibrapay_response: gibrapayResponse
@@ -113,7 +103,6 @@ serve(async (req) => {
       })
       .eq('id', transaction.id);
 
-    // Log audit event
     await supabaseAdmin.rpc('log_audit_event', {
       p_user_id: user.id,
       p_action: 'deposit_initiated',
@@ -126,8 +115,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         transaction_id: transaction.id,
-        payment_url: gibrapayResponse.payment_url,
-        reference: gibrapayResponse.reference,
+        gibrapay_response: gibrapayResponse,
         amount: amount,
         message: 'Deposit initiated. Complete payment on Gibrapay.'
       }),
@@ -137,11 +125,8 @@ serve(async (req) => {
   } catch (error) {
     console.error('Deposit error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ error: (error as Error).message }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

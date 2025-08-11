@@ -21,7 +21,7 @@ export const useGame = () => {
   const [isWaitingForNextRound, setIsWaitingForNextRound] = useState(true);
   
   // Player state
-  const [balance, setBalance] = useState(1000); // Starting balance
+  const [balance, setBalance] = useState(0); // Starting balance from deposits only
   const [betAmount, setBetAmount] = useState(10);
   const [isBetPlaced, setIsBetPlaced] = useState(false);
   const [canCashOut, setCanCashOut] = useState(false);

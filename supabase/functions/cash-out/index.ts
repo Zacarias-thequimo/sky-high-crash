@@ -92,11 +92,19 @@ serve(async (req) => {
       throw new Error('Failed to update balance');
     }
 
-    // Update user statistics
+    // Update user statistics (avoid SQL expression helper for reliability)
+    const { data: currentProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('total_won')
+      .eq('id', user.id)
+      .single();
+
+    const newTotalWon = (currentProfile?.total_won || 0) + winAmount;
+
     await supabaseAdmin
       .from('profiles')
       .update({
-        total_won: supabaseAdmin.sql`total_won + ${winAmount}`,
+        total_won: newTotalWon,
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id);

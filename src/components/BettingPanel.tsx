@@ -70,7 +70,7 @@ export const BettingPanel = ({
     return 'btn-bet';
   };
 
-  const isDisabled = isFlying && !canCashOut;
+  const isDisabled = (isFlying && !canCashOut) || (!isFlying && !isBetPlaced && (betAmount <= 0 || betAmount > balance));
 
   const handleAction = () => {
     if (isFlying && canCashOut) {

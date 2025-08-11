@@ -27,11 +27,7 @@ export const DepositButton = () => {
 
       if (error) throw error
 
-      toast({ title: 'Depósito iniciado', description: 'Redirecionando para o pagamento...' })
-      const paymentUrl = (data as any)?.payment_url || (data as any)?.payment?.url
-      if (paymentUrl) {
-        window.open(paymentUrl, '_blank')
-      }
+      toast({ title: 'Depósito iniciado', description: 'Pagamento em processamento via GibraPay.' })
       setOpen(false)
     } catch (err: any) {
       toast({ title: 'Falha ao iniciar depósito', description: err.message || 'Tente novamente', variant: 'destructive' })
