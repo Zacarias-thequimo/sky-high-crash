@@ -21,9 +21,11 @@ const Auth = () => {
 
     try {
       const normalizedPhone = phone.trim().startsWith('+') ? phone.trim() : `+258${phone.trim().replace(/\D/g, '')}`;
+      const pseudoEmail = `${normalizedPhone.replace(/^\+/, '').replace(/\D/g, '')}@phone.local`;
+
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          phone: normalizedPhone,
+          email: pseudoEmail,
           password,
         });
 
@@ -37,12 +39,14 @@ const Auth = () => {
         navigate('/');
       } else {
         const { error } = await supabase.auth.signUp({
-          phone: normalizedPhone,
+          email: pseudoEmail,
           password,
           options: {
             data: {
               full_name: fullName,
-            }
+              phone: normalizedPhone,
+            },
+            emailRedirectTo: `${window.location.origin}/`,
           }
         });
 
@@ -50,13 +54,14 @@ const Auth = () => {
 
         toast({
           title: "Conta criada com sucesso!",
-          description: "Verifique o SMS para confirmar a conta",
+          description: "Para usar sem SMS/OTP, desative 'Confirm email' nas configurações do Supabase Auth.",
         });
       }
     } catch (error: any) {
-      const msg = (error?.message?.includes('Phone signups are disabled') || error?.message?.includes('phone_provider_disabled'))
-        ? 'As inscrições por telefone estão desativadas no Supabase. Ative o provedor "Phone" em Auth > Providers e habilite "Signups".'
-        : error?.message ?? 'Ocorreu um erro. Tente novamente.';
+      const msg =
+        error?.message?.includes('Invalid login credentials') ? 'Telefone ou senha inválidos.' :
+        error?.message?.includes('already registered') ? 'Este telefone já está cadastrado.' :
+        error?.message ?? 'Ocorreu um erro. Tente novamente.';
       toast({
         title: "Erro na autenticação",
         description: msg,
