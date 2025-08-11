@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 /* SkyCrash Gaming Design System - All colors MUST be HSL */
-
 @layer base {
   :root {
     /* Gaming Dark Theme */
@@ -43,9 +42,9 @@
     --crash: 0 75% 60%;
     --profit: 120 75% 55%;
     --waiting: 45 95% 60%;
-    --multiplier-low: 217 91% 60%;    /* 1.00-2.00: Azul */
-    --multiplier-mid: 270 75% 65%;    /* 3.00-9.99: Roxo */
-    --multiplier-high: 330 85% 70%;   /* 10.00+: Rosa */
+    --multiplier-low: 217 91% 60%;    /* Azul */
+    --multiplier-mid: 270 75% 65%;    /* Roxo */
+    --multiplier-high: 330 85% 70%;   /* Rosa */
 
     --border: 220 15% 25%;
     --input: 220 15% 18%;
@@ -116,55 +115,67 @@
     box-shadow: var(--shadow-neon);
   }
 
-  /* Airplane Animation */
+  /* Animations */
   @keyframes fly {
-    0% {
-      transform: translate(0, 0) rotate(45deg);
-    }
-    100% {
-      transform: translate(300px, -200px) rotate(45deg);
-    }
+    0% { transform: translate(0, 0) rotate(45deg); }
+    100% { transform: translate(300px, -200px) rotate(45deg); }
   }
-
   .airplane-flying {
     animation: fly 3s linear infinite;
   }
 
-  /* Crash Animation */
   @keyframes crash-shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
   }
-
   .crash-effect {
     animation: crash-shake 0.5s ease-in-out 3;
   }
 
-  /* Pulse Animation for Waiting */
   @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
-    }
-    50% {
-      box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
-    }
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 40px hsl(var(--primary) / 0.6); }
   }
-
   .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
   /* Multiplier Color Classes */
-  .multiplier-low {
-    @apply text-multiplier-low;
-  }
+  .multiplier-low { @apply text-multiplier-low; }
+  .multiplier-mid { @apply text-multiplier-mid; }
+  .multiplier-high { @apply text-multiplier-high; }
+}
+
+@layer utilities {
+  /* Texto responsivo */
+  .responsive-text-xs { @apply text-xs sm:text-sm; }
+  .responsive-text-sm { @apply text-sm sm:text-base; }
+  .responsive-text-base { @apply text-base sm:text-lg; }
+  .responsive-text-lg { @apply text-lg sm:text-xl lg:text-2xl; }
+  .responsive-text-xl { @apply text-xl sm:text-2xl lg:text-3xl; }
   
-  .multiplier-mid {
-    @apply text-multiplier-mid;
-  }
+  /* Container responsivo */
+  .responsive-container { @apply container mx-auto px-4 sm:px-6 lg:px-8; }
   
-  .multiplier-high {
-    @apply text-multiplier-high;
-  }
+  /* Grid responsivo */
+  .responsive-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4; }
+  
+  /* Flex responsivo */
+  .responsive-flex { @apply flex flex-col sm:flex-row gap-4; }
+}
+
+/* Media queries extras */
+@media (max-width: 640px) {
+  .hide-mobile { display: none; }
+  .mobile-full-width { width: 100% !important; }
+  .mobile-stack { flex-direction: column !important; }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-stack { flex-direction: column !important; }
+}
+
+@media (min-width: 1025px) {
+  .desktop-row { flex-direction: row !important; }
 }
