@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface BetInfo {
-  amount: string | number; // string temporária para input
+  amount: string | number;
   isPlaced: boolean;
   canCashOut: boolean;
 }
@@ -23,13 +23,13 @@ export const DualBettingPanel = memo(
     isFlying,
     currentMultiplier,
   }: DualBettingPanelProps) => {
-    // Estado interno para apostas
     const [bets, setBets] = useState<{ panel1: BetInfo; panel2: BetInfo }>({
       panel1: { amount: '', isPlaced: false, canCashOut: false },
       panel2: { amount: '', isPlaced: false, canCashOut: false },
     });
 
-    // Atualiza valor do input
+    const quickAmounts = [10, 50, 100];
+
     const handleChangeAmount = (panel: 1 | 2, value: string) => {
       setBets((prev) => ({
         ...prev,
@@ -40,7 +40,16 @@ export const DualBettingPanel = memo(
       }));
     };
 
-    // Coloca a aposta
+    const handleQuickAmount = (panel: 1 | 2, value: number) => {
+      setBets((prev) => ({
+        ...prev,
+        [`panel${panel}`]: {
+          ...prev[`panel${panel}`],
+          amount: value,
+        },
+      }));
+    };
+
     const handlePlaceBet = (panel: 1 | 2) => {
       const betValue = parseFloat(bets[`panel${panel}`].amount as string);
       if (isNaN(betValue) || betValue < 1 || betValue > balance) return;
@@ -51,21 +60,20 @@ export const DualBettingPanel = memo(
           ...prev[`panel${panel}`],
           isPlaced: true,
           canCashOut: true,
-          amount: betValue, // converte para número só agora
+          amount: betValue,
         },
       }));
 
       onPlaceBet(betValue, panel);
     };
 
-    // Sacar aposta
     const handleCashOut = (panel: 1 | 2) => {
       setBets((prev) => ({
         ...prev,
         [`panel${panel}`]: {
           ...prev[`panel${panel}`],
           isPlaced: false,
-          amount: '', // reseta input
+          amount: '',
           canCashOut: false,
         },
       }));
@@ -73,7 +81,6 @@ export const DualBettingPanel = memo(
       onCashOut(panel);
     };
 
-    // Renderiza cada painel
     const renderPanel = (panel: 1 | 2) => {
       const bet = bets[`panel${panel}`];
 
@@ -83,7 +90,7 @@ export const DualBettingPanel = memo(
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-2">
               <input
-                type="text" // agora texto para permitir apagar o zero
+                type="text"
                 value={bet.amount}
                 onChange={(e) => handleChangeAmount(panel, e.target.value)}
                 className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm"
@@ -102,6 +109,21 @@ export const DualBettingPanel = memo(
                 Apostar
               </button>
             </div>
+
+            {/* Botões rápidos */}
+            {!bet.isPlaced && (
+              <div className="flex gap-2 mt-2">
+                {quickAmounts.map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => handleQuickAmount(panel, amount)}
+                    className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90"
+                  >
+                    {amount} MZN
+                  </button>
+                ))}
+              </div>
+            )}
 
             {bet.isPlaced && (
               <button
