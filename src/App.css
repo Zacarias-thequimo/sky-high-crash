@@ -1,16 +1,20 @@
 #root {
+  /* Adiciona responsividade ao container principal */
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem; /* Ajustado para responsividade */
   text-align: center;
+  width: 100%;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  height: 4em; /* Ajustado para responsivo */
+  padding: 1em;
   will-change: filter;
   transition: filter 300ms;
+  max-width: 90vw;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
@@ -27,16 +31,46 @@
   }
 }
 
+/* Mantém animação responsiva */
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* Cards */
 .card {
   padding: 2em;
 }
 
+/* Textos */
 .read-the-docs {
   color: #888;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+/* Exemplo: responsividade para mobile */
+@media (max-width: 600px) {
+  #root {
+    padding: 0.5rem;
+    max-width: 100vw;
+  }
+  .logo {
+    height: 2em;
+    padding: 0.5em;
+  }
+  .card {
+    padding: 1em;
+  }
+}
+
+/* Responsividade extra para telas muito pequenas */
+@media (max-width: 400px) {
+  .card {
+    padding: 0.5em;
+  }
+  .read-the-docs {
+    font-size: 0.8rem;
+  }
 }
