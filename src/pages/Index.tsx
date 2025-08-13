@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { PlayersList } from '@/components/PlayersList';
+import { AviatorGameArea } from '@/components/AviatorGameArea';
+import { DualBettingPanel } from '@/components/DualBettingPanel';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
-import { DualBetPanelClassic } from '@/components/DualBetPanelClassic';
-import { MultiplierHistoryBar } from '@/components/MultiplierHistoryBar';
-import { GameArea } from '@/components/GameArea'; // Usando GameArea para o gráfico e avião
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
