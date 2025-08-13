@@ -83,6 +83,8 @@ export const DualBettingPanel = memo(
 
     const renderPanel = (panel: 1 | 2) => {
       const bet = bets[`panel${panel}`];
+      const betValue = parseFloat(bet.amount as string);
+      const isValidAmount = !isNaN(betValue) && betValue >= 1 && betValue <= balance;
 
       return (
         <div key={panel} className="bg-card rounded-xl border border-border/50 p-4">
@@ -99,11 +101,7 @@ export const DualBettingPanel = memo(
               />
               <button
                 onClick={() => handlePlaceBet(panel)}
-                disabled={
-                  bet.isPlaced ||
-                  parseFloat(bet.amount as string) < 1 ||
-                  parseFloat(bet.amount as string) > balance
-                }
+                disabled={bet.isPlaced || !isValidAmount}
                 className="px-4 py-2 bg-success text-success-foreground rounded-lg text-sm font-medium hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Apostar
