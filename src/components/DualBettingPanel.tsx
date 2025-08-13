@@ -45,7 +45,7 @@ export const DualBettingPanel = memo(
         ...prev,
         [`panel${panel}`]: {
           ...prev[`panel${panel}`],
-          amount: value,
+          amount: value.toString(),
         },
       }));
     };
@@ -83,8 +83,8 @@ export const DualBettingPanel = memo(
 
     const renderPanel = (panel: 1 | 2) => {
       const bet = bets[`panel${panel}`];
-      const betValue = parseFloat(bet.amount as string);
-      const isValidAmount = !isNaN(betValue) && betValue >= 1 && betValue <= balance;
+      const betValue = bet.amount === '' ? 0 : parseFloat(bet.amount as string);
+      const isValidAmount = betValue >= 1 && betValue <= balance;
 
       return (
         <div key={panel} className="bg-card rounded-xl border border-border/50 p-4">
