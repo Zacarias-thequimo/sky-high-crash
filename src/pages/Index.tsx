@@ -72,20 +72,12 @@ const Index = () => {
       {/* Header */}
       <Header multiplierHistory={multiplierHistory} balance={balance} />
       
-      {/* Main Layout - Responsive */}
-      <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Sidebar - Players List - Hidden on mobile */}
-        <div className="hidden lg:block w-80 border-r border-gray-700">
-          <PlayersList 
-            totalBets={gameStats.totalBets}
-            totalPrize={0}
-          />
-        </div>
-        
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Game Area */}
-          <div className="flex-1 p-3 sm:p-6">
+      {/* Main Layout - Mobile First Responsive */}
+      <div className="flex-1 flex flex-col">
+        {/* Mobile Layout: Game Area + Betting */}
+        <div className="lg:hidden flex flex-col h-full">
+          {/* Game Area - Mobile */}
+          <div className="flex-1 p-2">
             <AviatorGameArea
               multiplier={currentMultiplier}
               isFlying={isFlying}
@@ -95,8 +87,8 @@ const Index = () => {
             />
           </div>
           
-          {/* Betting Panel */}
-          <div className="border-t border-gray-700 p-3 sm:p-6">
+          {/* Betting Panel - Mobile */}
+          <div className="border-t border-gray-700 p-2">
             <DualBettingPanel
               balance={balance}
               onPlaceBet={handlePlaceBet}
@@ -106,14 +98,51 @@ const Index = () => {
               bets={bets}
             />
           </div>
+
+          {/* Players List - Mobile Bottom */}
+          <div className="border-t border-gray-700">
+            <PlayersList 
+              totalBets={gameStats.totalBets}
+              totalPrize={0}
+            />
+          </div>
         </div>
 
-        {/* Players List for Mobile - Bottom */}
-        <div className="lg:hidden border-t border-gray-700">
-          <PlayersList 
-            totalBets={gameStats.totalBets}
-            totalPrize={0}
-          />
+        {/* Desktop Layout */}
+        <div className="hidden lg:flex flex-1">
+          {/* Left Sidebar - Players List - Desktop only */}
+          <div className="w-80 border-r border-gray-700">
+            <PlayersList 
+              totalBets={gameStats.totalBets}
+              totalPrize={0}
+            />
+          </div>
+          
+          {/* Main Content - Desktop */}
+          <div className="flex-1 flex flex-col">
+            {/* Game Area - Desktop */}
+            <div className="flex-1 p-6">
+              <AviatorGameArea
+                multiplier={currentMultiplier}
+                isFlying={isFlying}
+                isCrashed={isCrashed}
+                onCashOut={() => handleCashOut(1)}
+                canCashOut={canCashOut}
+              />
+            </div>
+            
+            {/* Betting Panel - Desktop */}
+            <div className="border-t border-gray-700 p-6">
+              <DualBettingPanel
+                balance={balance}
+                onPlaceBet={handlePlaceBet}
+                onCashOut={handleCashOut}
+                isFlying={isFlying}
+                currentMultiplier={currentMultiplier}
+                bets={bets}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
