@@ -13,9 +13,7 @@ function sanitizePhone(phone: string): string {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: corsHeaders
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -45,7 +43,6 @@ serve(async (req) => {
     if (profileError || !profile) throw new Error('User profile not found');
     if (!profile.is_active) throw new Error('Account is inactive');
 
-    // Limpa o número antes de usar
     const cleanPhone = sanitizePhone(phone || profile.phone);
 
     const { data: transaction, error: transactionError } = await supabaseAdmin
@@ -92,8 +89,16 @@ serve(async (req) => {
       })
     });
 
-    const gibrapayResponse = await gibrapayRequest.json();
-    console.log("🔹 Resposta da GibraPay:", gibrapayResponse);
+    // Captura resposta bruta
+    const rawResponse = await gibrapayRequest.text();
+    console.log("🔹 Resposta bruta da GibraPay:", rawResponse);
+
+    let gibrapayResponse;
+    try {
+      gibrapayResponse = JSON.parse(rawResponse);
+    } catch {
+      throw new Error(`Resposta não é JSON: ${rawResponse}`);
+    }
 
     if (!gibrapayRequest.ok || gibrapayResponse.status !== 'success') {
       throw new Error(`Erro GibraPay: ${JSON.stringify(gibrapayResponse)}`);
