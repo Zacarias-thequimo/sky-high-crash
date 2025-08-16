@@ -72,10 +72,10 @@ const Index = () => {
       {/* Header */}
       <Header multiplierHistory={multiplierHistory} balance={balance} />
       
-      {/* Main Layout */}
-      <div className="flex-1 flex">
-        {/* Left Sidebar - Players List */}
-        <div className="w-80 border-r border-gray-700">
+      {/* Main Layout - Responsive */}
+      <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Left Sidebar - Players List - Hidden on mobile */}
+        <div className="hidden lg:block w-80 border-r border-gray-700">
           <PlayersList 
             totalBets={gameStats.totalBets}
             totalPrize={0}
@@ -85,7 +85,7 @@ const Index = () => {
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {/* Game Area */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-3 sm:p-6">
             <AviatorGameArea
               multiplier={currentMultiplier}
               isFlying={isFlying}
@@ -96,7 +96,7 @@ const Index = () => {
           </div>
           
           {/* Betting Panel */}
-          <div className="border-t border-gray-700 p-6">
+          <div className="border-t border-gray-700 p-3 sm:p-6">
             <DualBettingPanel
               balance={balance}
               onPlaceBet={handlePlaceBet}
@@ -106,6 +106,14 @@ const Index = () => {
               bets={bets}
             />
           </div>
+        </div>
+
+        {/* Players List for Mobile - Bottom */}
+        <div className="lg:hidden border-t border-gray-700">
+          <PlayersList 
+            totalBets={gameStats.totalBets}
+            totalPrize={0}
+          />
         </div>
       </div>
     </div>

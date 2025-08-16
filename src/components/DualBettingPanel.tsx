@@ -59,12 +59,12 @@ export const DualBettingPanel = memo(({
     const isDisabled = isFlying && (!bet.isPlaced || !bet.canCashOut);
 
     return (
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 space-y-4">
+      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-2 sm:p-4 space-y-3 sm:space-y-4">
         {/* Mode Tabs */}
         <div className="flex rounded-lg overflow-hidden bg-gray-700/50">
           <button 
             onClick={() => setAutoMode(false)}
-            className={`flex-1 py-2 text-sm font-medium ${
+            className={`flex-1 py-1 sm:py-2 text-xs sm:text-sm font-medium ${
               !autoMode ? 'bg-gray-600 text-white' : 'text-gray-400'
             }`}
           >
@@ -72,7 +72,7 @@ export const DualBettingPanel = memo(({
           </button>
           <button 
             onClick={() => setAutoMode(true)}
-            className={`flex-1 py-2 text-sm font-medium ${
+            className={`flex-1 py-1 sm:py-2 text-xs sm:text-sm font-medium ${
               autoMode ? 'bg-gray-600 text-white' : 'text-gray-400'
             }`}
           >
@@ -152,7 +152,7 @@ export const DualBettingPanel = memo(({
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
       <BettingSection
         panelId={1}
         betAmount={betAmount1}

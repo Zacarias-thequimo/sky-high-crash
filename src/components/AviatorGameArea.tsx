@@ -63,49 +63,35 @@ export const AviatorGameArea = memo(({
   }, [isFlying, isCrashed]);
 
   return (
-    <div className="relative w-full h-96 bg-gray-900/95 border border-gray-700 rounded-lg overflow-hidden">
+    <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-900/95 border border-gray-700 rounded-lg overflow-hidden">
       {/* Game Chart Background */}
       <div className="absolute inset-0">
         <GameChart data={chartData.current} isFlying={isFlying} />
       </div>
 
-      {/* Airplane */}
-      <div 
-        className="absolute transition-all duration-150 ease-out z-10"
-        style={{
-          left: `${airplanePosition.x}%`,
-          top: `${airplanePosition.y}%`,
-          transform: 'translate(-50%, -50%)'
-        }}
-      >
-        <div className={`text-3xl transition-all duration-300 ${
-          isCrashed ? 'animate-ping text-red-500' : 'text-blue-400'
-        }`} style={{ transform: isFlying ? 'rotate(15deg)' : 'rotate(0deg)' }}>
-          ✈️
-        </div>
-      </div>
-
-      {/* Multiplier Display */}
-      <div className="absolute top-8 left-8 z-20">
-        <div className={`text-6xl font-black transition-all duration-300 ${
-          isCrashed ? 'text-red-500 animate-pulse' : 
-          isFlying ? 'text-green-400' : 'text-gray-400'
-        }`}>
-          {multiplier.toFixed(2)}x
-        </div>
-        {isFlying && !isCrashed && (
-          <div className="text-sm text-gray-400 mt-2 animate-pulse">
-            Voando...
+      {/* Multiplier Display - Centered */}
+      <div className="absolute inset-0 flex items-center justify-center z-20">
+        <div className="text-center">
+          <div className={`text-4xl sm:text-5xl md:text-6xl font-black transition-all duration-300 ${
+            isCrashed ? 'text-red-500 animate-pulse' : 
+            isFlying ? 'text-green-400' : 'text-gray-400'
+          }`}>
+            {multiplier.toFixed(2)}x
           </div>
-        )}
+          {isFlying && !isCrashed && (
+            <div className="text-sm text-gray-400 mt-2 animate-pulse">
+              Voando...
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Cash Out Button */}
       {isFlying && canCashOut && (
-        <div className="absolute top-8 right-8 z-20">
+        <div className="absolute top-4 right-4 z-20">
           <button 
             onClick={onCashOut}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg animate-pulse"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-3 py-2 sm:px-6 sm:py-3 rounded-lg animate-pulse text-sm sm:text-base"
           >
             SACAR {multiplier.toFixed(2)}x
           </button>
