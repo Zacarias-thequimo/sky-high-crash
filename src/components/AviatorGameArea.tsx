@@ -63,7 +63,7 @@ export const AviatorGameArea = memo(({
   }, [isFlying, isCrashed]);
 
   return (
-    <div className="relative w-full h-48 xs:h-56 sm:h-64 md:h-80 lg:h-96 bg-gray-900/95 border border-gray-700 rounded-lg overflow-hidden">
+    <div className="relative w-full h-48 xs:h-56 sm:h-64 md:h-80 lg:h-96 bg-gray-900/95 border border-gray-700 rounded-lg overflow-hidden mx-auto">
       {/* Game Chart Background */}
       <div className="absolute inset-0">
         <GameChart data={chartData.current} isFlying={isFlying} />

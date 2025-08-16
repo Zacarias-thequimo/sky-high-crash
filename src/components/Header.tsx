@@ -2,6 +2,8 @@ import { memo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { DepositButton } from '@/components/DepositButton';
+import { WithdrawButton } from '@/components/WithdrawButton';
+
 interface HeaderProps {
   multiplierHistory: number[];
   balance: number;
@@ -23,21 +25,21 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
   };
 
   return (
-    <div className="bg-gray-900/95 border-b border-gray-700 px-6 py-3">
-      <div className="flex items-center justify-between">
+    <div className="bg-gray-900/95 border-b border-gray-700 px-2 sm:px-4 md:px-6 py-3 w-full">
+      <div className="flex items-center justify-between w-full flex-wrap gap-2">
         {/* Logo */}
         <div className="flex items-center space-x-3">
           <h1 className="text-2xl font-bold text-red-500">Aviator</h1>
         </div>
 
         {/* Multiplier History */}
-        <div className="flex items-center space-x-1">
-          <span className="text-gray-400 text-sm mr-2">Últimas:</span>
-          <div className="flex space-x-1 overflow-x-auto">
+        <div className="flex items-center space-x-1 overflow-hidden">
+          <span className="text-gray-400 text-xs sm:text-sm mr-1 sm:mr-2">Últimas:</span>
+          <div className="flex space-x-1 overflow-x-auto max-w-[200px] sm:max-w-none">
             {multiplierHistory.slice(-10).map((multiplier, index) => (
               <div
                 key={index}
-                className={`text-xs font-bold px-2 py-1 rounded-md min-w-[45px] text-center transition-all duration-300 ${
+                className={`text-xs font-bold px-1 sm:px-2 py-1 rounded-md min-w-[35px] sm:min-w-[45px] text-center transition-all duration-300 ${
                   getMultiplierColor(multiplier)
                 } ${getMultiplierBgColor(multiplier)}`}
               >
@@ -48,20 +50,24 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
         </div>
 
         {/* User Info & Balance */}
-        <div className="flex items-center space-x-4">
-          <div className="text-green-400 font-bold">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="text-green-400 font-bold text-sm sm:text-base">
             {(profile?.balance || balance).toFixed(2)} MZN
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-300 text-sm">
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <span className="text-gray-300 text-xs sm:text-sm hidden sm:block">
               {profile?.full_name || user?.phone || 'Usuário'}
             </span>
+            <WithdrawButton 
+              balance={profile?.balance || balance}
+              onSuccess={() => window.location.reload()}
+            />
             <DepositButton />
             <Button
               onClick={signOut}
               variant="outline"
               size="sm"
-              className="text-gray-300 border-gray-600 hover:bg-gray-700"
+              className="text-gray-300 border-gray-600 hover:bg-gray-700 text-xs sm:text-sm"
             >
               Sair
             </Button>
