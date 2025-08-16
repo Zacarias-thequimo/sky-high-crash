@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameEngine, initializeGame, calculateProfit, calculatePayout } from '@/utils/gameLogic';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface GameStats {
   totalBets: number;
@@ -48,14 +49,33 @@ export const useGame = () => {
       setIsCrashed(false);
       setIsWaitingForNextRound(false);
     },
-    onGameCrash: (finalMultiplier: number) => {
+    onGameCrash: async (finalMultiplier: number) => {
       const roundedMultiplier = Number(finalMultiplier.toFixed(2));
       setCurrentMultiplier(roundedMultiplier);
       setIsFlying(false);
       setIsCrashed(true);
       
-      // Add to history
-      setMultiplierHistory(prev => [...prev, roundedMultiplier]);
+      // Add to server and local history
+      try {
+        const { error } = await supabase
+          .from('game_rounds')
+          .insert({
+            multiplier: roundedMultiplier,
+            seed_hash: `seed_${Date.now()}`
+          });
+        
+        if (error) {
+          console.error('Error saving game round:', error);
+        }
+      } catch (error) {
+        console.error('Error saving to server:', error);
+      }
+      
+      // Add to local history and maintain only last 20
+      setMultiplierHistory(prev => {
+        const newHistory = [...prev, roundedMultiplier];
+        return newHistory.slice(-20); // Keep only last 20
+      });
       
       // Handle bet result if player didn't cash out
       if (isBetPlaced && canCashOut) {
@@ -69,8 +89,22 @@ export const useGame = () => {
     }
   }), []); // Empty dependency array since callbacks are stable
 
-  // Initialize game on mount
+  // Load recent game history on mount
   useEffect(() => {
+    const loadRecentHistory = async () => {
+      try {
+        const { data, error } = await supabase.rpc('get_recent_game_rounds');
+        if (error) throw error;
+        
+        // Convert to multiplier array and reverse to show most recent last
+        const recentMultipliers = data?.map((round: any) => Number(round.multiplier)) || [];
+        setMultiplierHistory(recentMultipliers.reverse());
+      } catch (error) {
+        console.error('Error loading game history:', error);
+      }
+    };
+    
+    loadRecentHistory();
     initializeGame();
     startNextRound();
   }, []);
@@ -90,7 +124,16 @@ export const useGame = () => {
   }, [gameEngine]);
 
   const placeBet = useCallback(() => {
-    if (isFlying || isBetPlaced || betAmount > balance) {
+    if (isFlying || isBetPlaced) {
+      return;
+    }
+    
+    if (betAmount > balance) {
+      toast({
+        variant: "destructive",
+        title: "Saldo insuficiente",
+        description: `Você precisa de ${betAmount.toFixed(2)} MZN para fazer esta aposta. Saldo atual: ${balance.toFixed(2)} MZN`
+      });
       return;
     }
     
@@ -124,7 +167,7 @@ export const useGame = () => {
     handleWin(currentMultiplier);
     
     toast({
-      title: "Saque realizado!",
+      title: "Saque bem sucedido!",
       description: `Ganhou ${profit.toFixed(2)} MZN (${currentMultiplier.toFixed(2)}x)`,
     });
   }, [isFlying, canCashOut, isBetPlaced, betAmount, currentMultiplier, toast]);

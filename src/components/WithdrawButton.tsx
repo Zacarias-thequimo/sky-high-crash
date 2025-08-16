@@ -62,7 +62,7 @@ export const WithdrawButton = ({ balance, onSuccess }: WithdrawButtonProps) => {
       if (error) throw error;
 
       toast({
-        title: "Levantamento solicitado",
+        title: "Levantamento bem sucedido",
         description: `Sua solicitação de levantamento de ${withdrawAmount.toFixed(2)} MZN foi processada com sucesso.`
       });
 
@@ -75,8 +75,8 @@ export const WithdrawButton = ({ balance, onSuccess }: WithdrawButtonProps) => {
       console.error('Withdrawal error:', error);
       toast({
         variant: "destructive",
-        title: "Erro no levantamento",
-        description: error.message || "Falha ao processar levantamento. Tente novamente."
+        title: "Levantamento com falha",
+        description: error.message || "Erro ao efetuar saque. Tente novamente."
       });
     } finally {
       setIsLoading(false);
@@ -84,6 +84,18 @@ export const WithdrawButton = ({ balance, onSuccess }: WithdrawButtonProps) => {
   };
 
   const quickAmounts = [100, 500, 1000, 5000];
+
+  const handleQuickAmount = (amount: number) => {
+    if (amount <= balance) {
+      setAmount(amount.toString());
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Valor indisponível",
+        description: `Saldo insuficiente para levantar ${amount} MZN. Saldo atual: ${balance.toFixed(2)} MZN`
+      });
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -145,7 +157,7 @@ export const WithdrawButton = ({ balance, onSuccess }: WithdrawButtonProps) => {
                   key={quickAmount}
                   variant="outline"
                   size="sm"
-                  onClick={() => setAmount(quickAmount.toString())}
+                  onClick={() => handleQuickAmount(quickAmount)}
                   disabled={quickAmount > balance}
                   className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 text-xs"
                 >

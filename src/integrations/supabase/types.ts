@@ -240,6 +240,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_recent_game_rounds: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          crashed_at: string
+          created_at: string
+          id: string
+          multiplier: number
+        }[]
+      }
       log_audit_event: {
         Args: {
           p_action: string
