@@ -48,16 +48,51 @@ const Admin = () => {
   const [bonusDescription, setBonusDescription] = useState('');
   const [loadingAction, setLoadingAction] = useState(false);
 
-  // Check if user is admin
+  // Check if user is admin with server-side verification
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
-      navigate('/');
-      toast({
-        title: 'Acesso negado',
-        description: 'Você não tem permissão para acessar esta área.',
-        variant: 'destructive'
-      });
-    }
+    const checkAdminAccess = async () => {
+      if (!loading && user) {
+        // First check profile role (faster)
+        if (profile?.role === 'admin') {
+          return;
+        }
+        
+        // If profile doesn't show admin, check server directly
+        try {
+          const { data: isAdmin, error } = await supabase.rpc('is_admin', { 
+            user_id: user.id 
+          });
+          
+          if (error) throw error;
+          
+          if (!isAdmin) {
+            navigate('/');
+            toast({
+              title: 'Acesso negado',
+              description: 'Você não tem permissão para acessar esta área.',
+              variant: 'destructive'
+            });
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          navigate('/');
+          toast({
+            title: 'Erro de verificação',
+            description: 'Não foi possível verificar suas permissões.',
+            variant: 'destructive'
+          });
+        }
+      } else if (!loading && !user) {
+        navigate('/');
+        toast({
+          title: 'Acesso negado', 
+          description: 'Você precisa estar logado para acessar esta área.',
+          variant: 'destructive'
+        });
+      }
+    };
+
+    checkAdminAccess();
   }, [user, profile, loading, navigate, toast]);
 
   // Load users and admin actions
@@ -221,7 +256,7 @@ const Admin = () => {
     }
   };
 
-  if (loading || profile?.role !== 'admin') {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">

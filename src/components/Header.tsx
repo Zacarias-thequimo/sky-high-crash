@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const navigate = useNavigate();
   
   const getMultiplierColor = (value: number) => {
@@ -66,6 +66,16 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
               onSuccess={() => window.location.reload()}
             />
             <DepositButton />
+            
+            <Button
+              onClick={refreshProfile}
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:text-gray-200 text-xs sm:text-sm"
+              title="Atualizar permissões"
+            >
+              🔄
+            </Button>
             
             {profile?.role === 'admin' && (
               <Button

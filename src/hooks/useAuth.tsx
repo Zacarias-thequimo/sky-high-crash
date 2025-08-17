@@ -102,6 +102,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Set up realtime listener for profile changes
+  useEffect(() => {
+    if (!user) return;
+
+    const profileChannel = supabase
+      .channel('profile_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Profile updated:', payload);
+          // Update the profile state with the new data
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            setProfile(payload.new);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(profileChannel);
+    };
+  }, [user]);
+
   useEffect(() => {
     if (user && !profile) {
       refreshProfile();
