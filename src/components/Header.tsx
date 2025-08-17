@@ -1,10 +1,11 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DepositButton } from '@/components/DepositButton';
 import { WithdrawButton } from '@/components/WithdrawButton';
-import { Shield } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Shield, Menu } from 'lucide-react';
 
 interface HeaderProps {
   multiplierHistory: number[];
@@ -14,6 +15,7 @@ interface HeaderProps {
 export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
   const { user, profile, signOut, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const [sheetOpen, setSheetOpen] = useState(false);
   
   const getMultiplierColor = (value: number) => {
     if (value >= 1.00 && value <= 2.00) return 'text-multiplier-low';
@@ -61,42 +63,70 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
             <span className="text-gray-300 text-xs sm:text-sm hidden sm:block">
               {profile?.full_name || user?.phone || 'Usuário'}
             </span>
-            <WithdrawButton 
-              balance={profile?.balance || balance}
-              onSuccess={() => window.location.reload()}
-            />
-            <DepositButton />
             
-            <Button
-              onClick={refreshProfile}
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-gray-200 text-xs sm:text-sm"
-              title="Atualizar permissões"
-            >
-              🔄
-            </Button>
-            
-            {profile?.role === 'admin' && (
-              <Button
-                onClick={() => navigate('/admin')}
-                variant="secondary"
-                size="sm"
-                className="flex items-center gap-1 text-xs sm:text-sm"
-              >
-                <Shield className="h-3 w-3" />
-                <span className="hidden sm:inline">Admin</span>
-              </Button>
-            )}
-            
-            <Button
-              onClick={signOut}
-              variant="outline"
-              size="sm"
-              className="text-gray-300 border-gray-600 hover:bg-gray-700 text-xs sm:text-sm"
-            >
-              Sair
-            </Button>
+            {/* Hamburger Menu */}
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-gray-200"
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80 bg-gray-900 border-gray-700">
+                <div className="flex flex-col space-y-4 mt-6">
+                  <h3 className="text-lg font-semibold text-gray-200 mb-4">Menu de Ações</h3>
+                  
+                  <WithdrawButton 
+                    balance={profile?.balance || balance}
+                    onSuccess={() => {
+                      window.location.reload();
+                      setSheetOpen(false);
+                    }}
+                  />
+                  
+                  <DepositButton />
+                  
+                  <Button
+                    onClick={() => {
+                      refreshProfile();
+                      setSheetOpen(false);
+                    }}
+                    variant="ghost"
+                    className="justify-start text-gray-400 hover:text-gray-200"
+                  >
+                    🔄 Atualizar permissões
+                  </Button>
+                  
+                  {profile?.role === 'admin' && (
+                    <Button
+                      onClick={() => {
+                        navigate('/admin');
+                        setSheetOpen(false);
+                      }}
+                      variant="secondary"
+                      className="justify-start flex items-center gap-2"
+                    >
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </Button>
+                  )}
+                  
+                  <Button
+                    onClick={() => {
+                      signOut();
+                      setSheetOpen(false);
+                    }}
+                    variant="outline"
+                    className="justify-start text-gray-300 border-gray-600 hover:bg-gray-700"
+                  >
+                    Sair
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>

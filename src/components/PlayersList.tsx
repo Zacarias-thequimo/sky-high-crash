@@ -114,7 +114,7 @@ export const PlayersList = memo(({ totalBets, totalPrize }: PlayersListProps) =>
           <span>🛡️</span>
           <span>Provably Fair Game</span>
         </div>
-        <div className="text-primary">Powered by SPRIBE</div>
+        <div className="text-primary">Powered by 999BETS</div>
       </div>
     </div>
   );
