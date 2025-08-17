@@ -53,9 +53,6 @@ export const DualBettingPanel = memo(({
       if (isFlying && bet.isPlaced && !bet.canCashOut) {
         return 'SACOU!';
       }
-      if (isFlying && !bet.isPlaced) {
-        return 'VOANDO...';
-      }
       if (bet.isPlaced && bet.canCancel) {
         return 'CANCELAR';
       }
@@ -65,19 +62,18 @@ export const DualBettingPanel = memo(({
     const getButtonClass = () => {
       if (isFlying && bet.isPlaced && bet.canCashOut) return 'btn-cashout';
       if (isFlying && bet.isPlaced && !bet.canCashOut) return 'bg-success text-success-foreground';
-      if (isFlying && !bet.isPlaced) return 'bg-muted text-muted-foreground cursor-not-allowed';
       if (bet.isPlaced && bet.canCancel) return 'btn-cancel';
       return 'btn-bet';
     };
 
-    const isDisabled = (isFlying && !bet.canCashOut && !bet.canCancel) || (!isFlying && !bet.isPlaced && (betAmount <= 0 || betAmount > balance));
+    const isDisabled = (!bet.isPlaced && (betAmount <= 0 || betAmount > balance)) || (bet.isPlaced && !bet.canCashOut && !bet.canCancel);
 
     const handleAction = () => {
       if (isFlying && bet.canCashOut) {
         onCashOut(panelId);
       } else if (bet.canCancel) {
         onCancelBet(panelId);
-      } else if (!isFlying && !bet.isPlaced && betAmount <= balance && betAmount > 0) {
+      } else if (!bet.isPlaced && betAmount <= balance && betAmount > 0) {
         onPlaceBet(betAmount, panelId);
       }
     };
@@ -110,7 +106,7 @@ export const DualBettingPanel = memo(({
             <button 
               onClick={() => setBetAmount(Math.max(1, betAmount - 1))}
               className="px-3 py-3 text-muted-foreground hover:text-foreground text-lg transition-colors"
-              disabled={isFlying}
+              disabled={bet.isPlaced}
             >
               −
             </button>
@@ -120,7 +116,7 @@ export const DualBettingPanel = memo(({
             <button 
               onClick={() => setBetAmount(betAmount + 1)}
               className="px-3 py-3 text-muted-foreground hover:text-foreground text-lg transition-colors"
-              disabled={isFlying}
+              disabled={bet.isPlaced}
             >
               +
             </button>
@@ -132,7 +128,7 @@ export const DualBettingPanel = memo(({
               <Button
                 key={amount}
                 onClick={() => setBetAmount(amount)}
-                disabled={isFlying}
+                disabled={bet.isPlaced}
                 variant="outline"
                 size="sm"
                 className="text-xs font-medium"
