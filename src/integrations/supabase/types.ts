@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action_type: string
+          admin_id: string
+          amount: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          amount?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          amount?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          target_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_actions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_actions_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -147,6 +195,7 @@ export type Database = {
           kyc_documents: Json | null
           kyc_status: Database["public"]["Enums"]["kyc_status"] | null
           phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
           total_bet: number | null
           total_deposited: number | null
           total_withdrawn: number | null
@@ -166,6 +215,7 @@ export type Database = {
           kyc_documents?: Json | null
           kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
           phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           total_bet?: number | null
           total_deposited?: number | null
           total_withdrawn?: number | null
@@ -185,6 +235,7 @@ export type Database = {
           kyc_documents?: Json | null
           kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
           phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           total_bet?: number | null
           total_deposited?: number | null
           total_withdrawn?: number | null
@@ -249,6 +300,10 @@ export type Database = {
           multiplier: number
         }[]
       }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       log_audit_event: {
         Args: {
           p_action: string
@@ -270,6 +325,7 @@ export type Database = {
       kyc_status: "pending" | "approved" | "rejected" | "not_submitted"
       transaction_status: "pending" | "completed" | "failed" | "cancelled"
       transaction_type: "deposit" | "withdrawal" | "bet" | "win" | "loss"
+      user_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -401,6 +457,7 @@ export const Constants = {
       kyc_status: ["pending", "approved", "rejected", "not_submitted"],
       transaction_status: ["pending", "completed", "failed", "cancelled"],
       transaction_type: ["deposit", "withdrawal", "bet", "win", "loss"],
+      user_role: ["admin", "user"],
     },
   },
 } as const
