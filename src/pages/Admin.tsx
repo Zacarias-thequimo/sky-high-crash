@@ -145,13 +145,14 @@ const Admin = () => {
         .from('transactions')
         .insert({
           user_id: selectedUserId,
-          type: 'bonus',
+          type: 'deposit',
           amount: amount,
           status: 'completed',
           description: `Bônus administrativo: ${bonusDescription || 'Sem descrição'}`,
           metadata: {
             admin_id: user!.id,
-            admin_action: true
+            admin_action: true,
+            transaction_type: 'bonus'
           }
         });
 

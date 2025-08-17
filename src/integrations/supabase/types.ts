@@ -324,7 +324,13 @@ export type Database = {
       bet_status: "active" | "won" | "lost" | "cancelled"
       kyc_status: "pending" | "approved" | "rejected" | "not_submitted"
       transaction_status: "pending" | "completed" | "failed" | "cancelled"
-      transaction_type: "deposit" | "withdrawal" | "bet" | "win" | "loss"
+      transaction_type:
+        | "deposit"
+        | "withdrawal"
+        | "bet"
+        | "win"
+        | "loss"
+        | "bonus"
       user_role: "admin" | "user"
     }
     CompositeTypes: {
@@ -456,7 +462,14 @@ export const Constants = {
       bet_status: ["active", "won", "lost", "cancelled"],
       kyc_status: ["pending", "approved", "rejected", "not_submitted"],
       transaction_status: ["pending", "completed", "failed", "cancelled"],
-      transaction_type: ["deposit", "withdrawal", "bet", "win", "loss"],
+      transaction_type: [
+        "deposit",
+        "withdrawal",
+        "bet",
+        "win",
+        "loss",
+        "bonus",
+      ],
       user_role: ["admin", "user"],
     },
   },

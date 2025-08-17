@@ -1,8 +1,10 @@
 import { memo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DepositButton } from '@/components/DepositButton';
 import { WithdrawButton } from '@/components/WithdrawButton';
+import { Shield } from 'lucide-react';
 
 interface HeaderProps {
   multiplierHistory: number[];
@@ -11,6 +13,7 @@ interface HeaderProps {
 
 export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
   
   const getMultiplierColor = (value: number) => {
     if (value >= 1.00 && value <= 2.00) return 'text-multiplier-low';
@@ -63,6 +66,19 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
               onSuccess={() => window.location.reload()}
             />
             <DepositButton />
+            
+            {profile?.role === 'admin' && (
+              <Button
+                onClick={() => navigate('/admin')}
+                variant="secondary"
+                size="sm"
+                className="flex items-center gap-1 text-xs sm:text-sm"
+              >
+                <Shield className="h-3 w-3" />
+                <span className="hidden sm:inline">Admin</span>
+              </Button>
+            )}
+            
             <Button
               onClick={signOut}
               variant="outline"
