@@ -17,17 +17,15 @@ const Index = () => {
     isFlying,
     isCrashed,
     balance,
-    canCancel,
     placeBet,
     cashOut,
-    cancelBet,
     multiplierHistory,
     gameStats
   } = useGame();
 
   const [bets, setBets] = useState({
-    panel1: { amount: 1.00, isPlaced: false, canCashOut: false, canCancel: false },
-    panel2: { amount: 8.00, isPlaced: false, canCashOut: false, canCancel: false }
+    panel1: { amount: 1.00, isPlaced: false, canCashOut: false },
+    panel2: { amount: 8.00, isPlaced: false, canCashOut: false }
   });
 
   // Redirect to auth if not logged in
@@ -41,12 +39,12 @@ const Index = () => {
     if (panel === 1) {
       setBets(prev => ({
         ...prev,
-        panel1: { ...prev.panel1, amount, isPlaced: true, canCashOut: true, canCancel }
+        panel1: { ...prev.panel1, amount, isPlaced: true, canCashOut: true }
       }));
     } else {
       setBets(prev => ({
         ...prev,
-        panel2: { ...prev.panel2, amount, isPlaced: true, canCashOut: true, canCancel }
+        panel2: { ...prev.panel2, amount, isPlaced: true, canCashOut: true }
       }));
     }
     placeBet();
@@ -56,30 +54,15 @@ const Index = () => {
     if (panel === 1) {
       setBets(prev => ({
         ...prev,
-        panel1: { ...prev.panel1, canCashOut: false, canCancel: false }
+        panel1: { ...prev.panel1, canCashOut: false }
       }));
     } else {
       setBets(prev => ({
         ...prev,
-        panel2: { ...prev.panel2, canCashOut: false, canCancel: false }
+        panel2: { ...prev.panel2, canCashOut: false }
       }));
     }
     cashOut();
-  };
-
-  const handleCancelBet = (panel: 1 | 2) => {
-    if (panel === 1) {
-      setBets(prev => ({
-        ...prev,
-        panel1: { ...prev.panel1, isPlaced: false, canCashOut: false, canCancel: false }
-      }));
-    } else {
-      setBets(prev => ({
-        ...prev,
-        panel2: { ...prev.panel2, isPlaced: false, canCashOut: false, canCancel: false }
-      }));
-    }
-    cancelBet();
   };
 
   const canCashOut = bets.panel1.canCashOut || bets.panel2.canCashOut;
@@ -110,7 +93,6 @@ const Index = () => {
               balance={balance}
               onPlaceBet={handlePlaceBet}
               onCashOut={handleCashOut}
-              onCancelBet={handleCancelBet}
               isFlying={isFlying}
               currentMultiplier={currentMultiplier}
               bets={bets}
@@ -155,7 +137,6 @@ const Index = () => {
                 balance={balance}
                 onPlaceBet={handlePlaceBet}
                 onCashOut={handleCashOut}
-                onCancelBet={handleCancelBet}
                 isFlying={isFlying}
                 currentMultiplier={currentMultiplier}
                 bets={bets}

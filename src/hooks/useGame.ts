@@ -26,7 +26,6 @@ export const useGame = () => {
   const [betAmount, setBetAmount] = useState(10);
   const [isBetPlaced, setIsBetPlaced] = useState(false);
   const [canCashOut, setCanCashOut] = useState(false);
-  const [canCancel, setCanCancel] = useState(false);
   const [cashOutMultiplier, setCashOutMultiplier] = useState(0);
   
   // History and stats
@@ -40,6 +39,7 @@ export const useGame = () => {
     isWinStreak: true
   });
 
+  // Game engine - memoized to prevent recreation
   const gameEngine = useMemo(() => new GameEngine({
     onMultiplierUpdate: (multiplier: number) => {
       setCurrentMultiplier(Number(multiplier.toFixed(2))); // Round to prevent floating point issues
@@ -48,7 +48,6 @@ export const useGame = () => {
       setIsFlying(true);
       setIsCrashed(false);
       setIsWaitingForNextRound(false);
-      setCanCancel(false); // Não pode cancelar quando o voo começou
     },
     onGameCrash: async (finalMultiplier: number) => {
       const roundedMultiplier = Number(finalMultiplier.toFixed(2));
@@ -78,44 +77,17 @@ export const useGame = () => {
         return newHistory.slice(-20); // Keep only last 20
       });
       
+      // Handle bet result if player didn't cash out
+      if (isBetPlaced && canCashOut) {
+        handleLoss();
+      }
+      
       // Start next round after delay (10 seconds)
       setTimeout(() => {
         startNextRound();
       }, 10000);
     }
-  }), []);
-
-  const handleLoss = useCallback(() => {
-    setGameStats(prev => {
-      const newStats = {
-        ...prev,
-        totalLosses: prev.totalLosses + 1,
-        currentStreak: !prev.isWinStreak ? prev.currentStreak + 1 : 1,
-        isWinStreak: false
-      };
-      return newStats;
-    });
-    
-    toast({
-      title: "Perdeu!",
-      description: `Perdeu ${betAmount.toFixed(2)} MZN`,
-      variant: "destructive"
-    });
-  }, [betAmount, toast]);
-
-  // Handle game start effect
-  useEffect(() => {
-    if (isFlying && isBetPlaced && !canCashOut) {
-      setCanCashOut(true);
-    }
-  }, [isFlying, isBetPlaced, canCashOut]);
-
-  // Handle bet result on crash
-  useEffect(() => {
-    if (isCrashed && isBetPlaced && canCashOut) {
-      handleLoss();
-    }
-  }, [isCrashed, isBetPlaced, canCashOut, handleLoss]);
+  }), []); // Empty dependency array since callbacks are stable
 
   // Load recent game history on mount
   useEffect(() => {
@@ -142,7 +114,6 @@ export const useGame = () => {
     setIsWaitingForNextRound(true);
     setIsBetPlaced(false);
     setCanCashOut(false);
-    setCanCancel(false);
     setCashOutMultiplier(0);
     setCurrentMultiplier(1.0);
     
@@ -153,7 +124,7 @@ export const useGame = () => {
   }, [gameEngine]);
 
   const placeBet = useCallback(() => {
-    if (isBetPlaced) {
+    if (isFlying || isBetPlaced) {
       return;
     }
     
@@ -168,8 +139,7 @@ export const useGame = () => {
     
     setBalance(prev => prev - betAmount);
     setIsBetPlaced(true);
-    setCanCashOut(isFlying); // Só pode sacar se o voo já começou
-    setCanCancel(!isFlying); // Só pode cancelar se o voo ainda não começou
+    setCanCashOut(true);
     
     setGameStats(prev => ({
       ...prev,
@@ -180,7 +150,7 @@ export const useGame = () => {
       title: "Aposta realizada!",
       description: `${betAmount.toFixed(2)} MZN apostado`,
     });
-  }, [betAmount, balance, isBetPlaced, isFlying, toast]);
+  }, [betAmount, balance, isFlying, isBetPlaced, toast]);
 
   const cashOut = useCallback(() => {
     if (!isFlying || !canCashOut || !isBetPlaced) {
@@ -192,7 +162,6 @@ export const useGame = () => {
     
     setBalance(prev => prev + payout);
     setCanCashOut(false);
-    setCanCancel(false);
     setCashOutMultiplier(currentMultiplier);
     
     handleWin(currentMultiplier);
@@ -216,28 +185,23 @@ export const useGame = () => {
     });
   }, []);
 
-  const cancelBet = useCallback(() => {
-    if (!canCancel || !isBetPlaced || isFlying) {
-      return;
-    }
-    
-    // Devolver o dinheiro da aposta
-    setBalance(prev => prev + betAmount);
-    setIsBetPlaced(false);
-    setCanCashOut(false);
-    setCanCancel(false);
-    
-    // Reverter estatísticas
-    setGameStats(prev => ({
-      ...prev,
-      totalBets: Math.max(0, prev.totalBets - 1)
-    }));
+  const handleLoss = useCallback(() => {
+    setGameStats(prev => {
+      const newStats = {
+        ...prev,
+        totalLosses: prev.totalLosses + 1,
+        currentStreak: !prev.isWinStreak ? prev.currentStreak + 1 : 1,
+        isWinStreak: false
+      };
+      return newStats;
+    });
     
     toast({
-      title: "Aposta cancelada",
-      description: `${betAmount.toFixed(2)} MZN devolvido`,
+      title: "Perdeu!",
+      description: `Perdeu ${betAmount.toFixed(2)} MZN`,
+      variant: "destructive"
     });
-  }, [canCancel, isBetPlaced, isFlying, betAmount, toast]);
+  }, [betAmount, toast]);
 
   return {
     // Game state
@@ -252,13 +216,11 @@ export const useGame = () => {
     setBetAmount,
     isBetPlaced,
     canCashOut,
-    canCancel,
     cashOutMultiplier,
     
     // Actions
     placeBet,
     cashOut,
-    cancelBet,
     
     // History and stats
     multiplierHistory,

@@ -77,12 +77,7 @@ export const Header = memo(({ multiplierHistory, balance }: HeaderProps) => {
               </SheetTrigger>
               <SheetContent side="right" className="w-80 bg-gray-900 border-gray-700">
                 <div className="flex flex-col space-y-4 mt-6">
-                  <div className="border-b border-gray-700 pb-4 mb-4">
-                    <h3 className="text-lg font-semibold text-gray-200 mb-2">Menu de Ações</h3>
-                    <div className="text-sm text-gray-400">
-                      Usuário: <span className="text-gray-200 font-medium">{profile?.full_name || user?.phone || 'Anônimo'}</span>
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-semibold text-gray-200 mb-4">Menu de Ações</h3>
                   
                   <WithdrawButton 
                     balance={profile?.balance || balance}
