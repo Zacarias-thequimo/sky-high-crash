@@ -26,6 +26,7 @@ export const useGame = () => {
   const [betAmount, setBetAmount] = useState(10);
   const [isBetPlaced, setIsBetPlaced] = useState(false);
   const [canCashOut, setCanCashOut] = useState(false);
+  const [canCancel, setCanCancel] = useState(false);
   const [cashOutMultiplier, setCashOutMultiplier] = useState(0);
   
   // History and stats
@@ -48,6 +49,7 @@ export const useGame = () => {
       setIsFlying(true);
       setIsCrashed(false);
       setIsWaitingForNextRound(false);
+      setCanCancel(false); // Não pode cancelar quando o voo começou
     },
     onGameCrash: async (finalMultiplier: number) => {
       const roundedMultiplier = Number(finalMultiplier.toFixed(2));
@@ -114,6 +116,7 @@ export const useGame = () => {
     setIsWaitingForNextRound(true);
     setIsBetPlaced(false);
     setCanCashOut(false);
+    setCanCancel(false);
     setCashOutMultiplier(0);
     setCurrentMultiplier(1.0);
     
@@ -140,6 +143,7 @@ export const useGame = () => {
     setBalance(prev => prev - betAmount);
     setIsBetPlaced(true);
     setCanCashOut(true);
+    setCanCancel(!isFlying); // Pode cancelar apenas se o voo ainda não começou
     
     setGameStats(prev => ({
       ...prev,
@@ -162,6 +166,7 @@ export const useGame = () => {
     
     setBalance(prev => prev + payout);
     setCanCashOut(false);
+    setCanCancel(false);
     setCashOutMultiplier(currentMultiplier);
     
     handleWin(currentMultiplier);
@@ -203,6 +208,29 @@ export const useGame = () => {
     });
   }, [betAmount, toast]);
 
+  const cancelBet = useCallback(() => {
+    if (!canCancel || !isBetPlaced || isFlying) {
+      return;
+    }
+    
+    // Devolver o dinheiro da aposta
+    setBalance(prev => prev + betAmount);
+    setIsBetPlaced(false);
+    setCanCashOut(false);
+    setCanCancel(false);
+    
+    // Reverter estatísticas
+    setGameStats(prev => ({
+      ...prev,
+      totalBets: Math.max(0, prev.totalBets - 1)
+    }));
+    
+    toast({
+      title: "Aposta cancelada",
+      description: `${betAmount.toFixed(2)} MZN devolvido`,
+    });
+  }, [canCancel, isBetPlaced, isFlying, betAmount, toast]);
+
   return {
     // Game state
     currentMultiplier,
@@ -216,11 +244,13 @@ export const useGame = () => {
     setBetAmount,
     isBetPlaced,
     canCashOut,
+    canCancel,
     cashOutMultiplier,
     
     // Actions
     placeBet,
     cashOut,
+    cancelBet,
     
     // History and stats
     multiplierHistory,

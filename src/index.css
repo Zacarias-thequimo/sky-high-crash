@@ -89,6 +89,10 @@
     @apply bg-success text-success-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-success/90 hover:shadow-lg hover:scale-105 active:scale-95;
   }
   
+  .btn-cancel {
+    @apply bg-destructive text-destructive-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-destructive/90 hover:shadow-lg hover:scale-105 active:scale-95;
+  }
+  
   .btn-cashout {
     @apply bg-warning text-warning-foreground font-bold rounded-lg px-8 py-4 transition-all duration-300 hover:bg-warning/90 hover:shadow-lg hover:scale-105 active:scale-95 animate-pulse;
   }

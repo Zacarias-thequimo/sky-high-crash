@@ -8,9 +8,11 @@ interface BettingPanelProps {
   setBetAmount: (amount: number) => void;
   onPlaceBet: () => void;
   onCashOut: () => void;
+  onCancelBet: () => void;
   isFlying: boolean;
   isBetPlaced: boolean;
   canCashOut: boolean;
+  canCancel: boolean;
   currentMultiplier: number;
   isCrashed: boolean;
 }
@@ -21,9 +23,11 @@ export const BettingPanel = ({
   setBetAmount,
   onPlaceBet,
   onCashOut,
+  onCancelBet,
   isFlying,
   isBetPlaced,
   canCashOut,
+  canCancel,
   currentMultiplier,
   isCrashed
 }: BettingPanelProps) => {
@@ -59,7 +63,10 @@ export const BettingPanel = ({
     if (isFlying && !isBetPlaced) {
       return 'VOANDO...';
     }
-    return 'APOSTAR';
+    if (isBetPlaced && canCancel) {
+      return 'CANCELAR';
+    }
+    return `APOSTAR ${betAmount.toFixed(2)} MZN`;
   };
 
   const getButtonClass = () => {
@@ -67,14 +74,17 @@ export const BettingPanel = ({
     if (isFlying && isBetPlaced && canCashOut) return 'btn-cashout';
     if (isFlying && isBetPlaced && !canCashOut) return 'bg-success text-success-foreground';
     if (isFlying && !isBetPlaced) return 'bg-muted text-muted-foreground cursor-not-allowed';
+    if (isBetPlaced && canCancel) return 'btn-cancel';
     return 'btn-bet';
   };
 
-  const isDisabled = (isFlying && !canCashOut) || (!isFlying && !isBetPlaced && (betAmount <= 0 || betAmount > balance));
+  const isDisabled = (isFlying && !canCashOut && !canCancel) || (!isFlying && !isBetPlaced && (betAmount <= 0 || betAmount > balance));
 
   const handleAction = () => {
     if (isFlying && canCashOut) {
       onCashOut();
+    } else if (canCancel) {
+      onCancelBet();
     } else if (!isFlying && !isBetPlaced && betAmount <= balance && betAmount > 0) {
       onPlaceBet();
     }
