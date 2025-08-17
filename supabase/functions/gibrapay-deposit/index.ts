@@ -101,17 +101,47 @@ serve(async (req) => {
     }
 
     if (!gibrapayRequest.ok || gibrapayResponse.status !== 'success') {
-      throw new Error(`Erro GibraPay: ${JSON.stringify(gibrapayResponse)}`);
+      // Atualiza a transação como falhou
+      await supabaseAdmin.from('transactions').update({
+        status: 'failed',
+        metadata: {
+          ...transaction.metadata,
+          gibrapay_response: gibrapayResponse,
+          error_reason: 'Payment failed'
+        }
+      }).eq('id', transaction.id);
+
+      throw new Error(`Pagamento não foi bem-sucedido. Tente novamente.`);
     }
 
+    // Pagamento bem-sucedido - atualizar saldo do usuário
+    const balanceUpdated = await supabaseAdmin.rpc('update_user_balance', {
+      p_user_id: user.id,
+      p_amount: amount,
+      p_operation: 'add'
+    });
+
+    if (!balanceUpdated) {
+      throw new Error('Erro ao atualizar saldo do usuário');
+    }
+
+    // Atualizar transação como concluída
     await supabaseAdmin.from('transactions').update({
       external_transaction_id: gibrapayResponse.transaction_id || null,
-      status: 'processing',
+      status: 'completed',
       metadata: {
         ...transaction.metadata,
         gibrapay_response: gibrapayResponse
       }
     }).eq('id', transaction.id);
+
+    // Atualizar total depositado no perfil do usuário
+    await supabaseAdmin
+      .from('profiles')
+      .update({
+        total_deposited: profile.total_deposited + amount
+      })
+      .eq('id', user.id);
 
     await supabaseAdmin.rpc('log_audit_event', {
       p_user_id: user.id,
@@ -129,7 +159,7 @@ serve(async (req) => {
       transaction_id: transaction.id,
       gibrapay_response: gibrapayResponse,
       amount: amount,
-      message: 'Deposit initiated. Complete payment on Gibrapay.'
+      message: 'Depósito bem-sucedido! Saldo atualizado na sua conta.'
     }), {
       headers: {
         ...corsHeaders,

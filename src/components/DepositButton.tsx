@@ -27,10 +27,25 @@ export const DepositButton = () => {
 
       if (error) throw error
 
-      toast({ title: 'Depósito iniciado', description: 'Pagamento em processamento via GibraPay.' })
-      setOpen(false)
+      if (data?.success) {
+        toast({ 
+          title: 'Depósito bem-sucedido!', 
+          description: `${amount} MZN foi adicionado ao seu saldo.`,
+          variant: 'default'
+        })
+        setOpen(false)
+        // Resetar campos
+        setAmount(100)
+        setPhone('+258')
+      } else {
+        throw new Error(data?.message || 'Falha no pagamento')
+      }
     } catch (err: any) {
-      toast({ title: 'Falha ao iniciar depósito', description: err.message || 'Tente novamente', variant: 'destructive' })
+      toast({ 
+        title: 'Pagamento não foi bem-sucedido', 
+        description: err.message || 'Tente novamente mais tarde', 
+        variant: 'destructive' 
+      })
     } finally {
       setLoading(false)
     }
