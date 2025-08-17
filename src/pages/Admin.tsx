@@ -46,6 +46,7 @@ const Admin = () => {
   const [selectedUserId, setSelectedUserId] = useState('');
   const [bonusAmount, setBonusAmount] = useState('');
   const [bonusDescription, setBonusDescription] = useState('');
+  const [newAdminUserId, setNewAdminUserId] = useState('');
   const [loadingAction, setLoadingAction] = useState(false);
 
   // Check if user is admin with server-side verification
@@ -256,6 +257,58 @@ const Admin = () => {
     }
   };
 
+  const promoteToAdmin = async () => {
+    if (!newAdminUserId) {
+      toast({
+        title: 'Dados inválidos',
+        description: 'Selecione um usuário para promover',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoadingAction(true);
+
+    try {
+      // Update user role to admin
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: 'admin' })
+        .eq('id', newAdminUserId);
+
+      if (error) throw error;
+
+      // Log admin action
+      await supabase
+        .from('admin_actions')
+        .insert({
+          admin_id: user!.id,
+          action_type: 'user_promoted_to_admin',
+          target_user_id: newAdminUserId,
+          description: 'Usuário promovido a administrador'
+        });
+
+      toast({
+        title: 'Admin criado!',
+        description: 'Usuário promovido a administrador com sucesso.'
+      });
+
+      // Reset form and reload data
+      setNewAdminUserId('');
+      loadUsers();
+      loadAdminActions();
+
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao promover usuário',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -352,6 +405,7 @@ const Admin = () => {
           <TabsList>
             <TabsTrigger value="users">Usuários</TabsTrigger>
             <TabsTrigger value="bonus">Conceder Bônus</TabsTrigger>
+            <TabsTrigger value="admins">Adicionar Admin</TabsTrigger>
             <TabsTrigger value="actions">Histórico de Ações</TabsTrigger>
           </TabsList>
 
@@ -477,6 +531,55 @@ const Admin = () => {
                   className="w-full"
                 >
                   {loadingAction ? 'Processando...' : 'Conceder Bônus'}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Add Admin Tab */}
+          <TabsContent value="admins">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Adicionar Novo Admin
+                </CardTitle>
+                <CardDescription>
+                  Promova um usuário existente para administrador
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Selecionar Usuário</label>
+                  <select
+                    value={newAdminUserId}
+                    onChange={(e) => setNewAdminUserId(e.target.value)}
+                    className="w-full mt-1 p-2 border rounded-md bg-background"
+                  >
+                    <option value="">Escolha um usuário para promover...</option>
+                    {users.filter(u => u.role !== 'admin').map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.full_name || user.email} - {user.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <h4 className="font-medium text-yellow-800 mb-2">⚠️ Atenção</h4>
+                  <p className="text-sm text-yellow-700">
+                    Ao promover um usuário para administrador, ele terá acesso total ao painel administrativo, 
+                    incluindo a capacidade de gerenciar outros usuários e conceder bônus. Esta ação não pode ser desfeita facilmente.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={promoteToAdmin}
+                  disabled={loadingAction || !newAdminUserId}
+                  className="w-full"
+                  variant="destructive"
+                >
+                  {loadingAction ? 'Processando...' : 'Promover a Admin'}
                 </Button>
               </CardContent>
             </Card>
