@@ -47,6 +47,7 @@ const Admin = () => {
   const [bonusAmount, setBonusAmount] = useState('');
   const [bonusDescription, setBonusDescription] = useState('');
   const [newAdminUserId, setNewAdminUserId] = useState('');
+  const [demoteAdminUserId, setDemoteAdminUserId] = useState('');
   const [loadingAction, setLoadingAction] = useState(false);
 
   // Check if user is admin with server-side verification
@@ -301,6 +302,58 @@ const Admin = () => {
     } catch (error: any) {
       toast({
         title: 'Erro ao promover usuário',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const demoteFromAdmin = async () => {
+    if (!demoteAdminUserId) {
+      toast({
+        title: 'Dados inválidos',
+        description: 'Selecione um admin para rebaixar',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoadingAction(true);
+
+    try {
+      // Update user role to user
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: 'user' })
+        .eq('id', demoteAdminUserId);
+
+      if (error) throw error;
+
+      // Log admin action
+      await supabase
+        .from('admin_actions')
+        .insert({
+          admin_id: user!.id,
+          action_type: 'admin_demoted_to_user',
+          target_user_id: demoteAdminUserId,
+          description: 'Administrador rebaixado a usuário comum'
+        });
+
+      toast({
+        title: 'Admin removido!',
+        description: 'Administrador foi rebaixado a usuário comum.'
+      });
+
+      // Reset form and reload data
+      setDemoteAdminUserId('');
+      loadUsers();
+      loadAdminActions();
+
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao rebaixar administrador',
         description: error.message,
         variant: 'destructive'
       });
@@ -581,6 +634,45 @@ const Admin = () => {
                 >
                   {loadingAction ? 'Processando...' : 'Promover a Admin'}
                 </Button>
+
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-4">Remover Admin</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium">Selecionar Admin para Remover</label>
+                      <select
+                        value={demoteAdminUserId}
+                        onChange={(e) => setDemoteAdminUserId(e.target.value)}
+                        className="w-full mt-1 p-2 border rounded-md bg-background"
+                      >
+                        <option value="">Escolha um admin para rebaixar...</option>
+                        {users.filter(u => u.role === 'admin' && u.id !== user?.id).map((admin) => (
+                          <option key={admin.id} value={admin.id}>
+                            {admin.full_name || admin.email} - {admin.email}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+                      <h4 className="font-medium text-red-800 mb-2">⚠️ Atenção</h4>
+                      <p className="text-sm text-red-700">
+                        Ao remover um administrador, ele perderá todos os privilégios administrativos e voltará a ser um usuário comum. 
+                        Esta ação pode ser revertida promovendo-o novamente.
+                      </p>
+                    </div>
+
+                    <Button
+                      onClick={demoteFromAdmin}
+                      disabled={loadingAction || !demoteAdminUserId}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      {loadingAction ? 'Processando...' : 'Remover Admin'}
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
