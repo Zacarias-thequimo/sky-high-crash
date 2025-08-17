@@ -33,7 +33,7 @@ export const MultiplierDisplay = memo(({
 
   return (
     <div className="text-center">
-      <div className={`${getDisplayClass()} text-6xl md:text-8xl lg:text-9xl font-bold`}>
+      <div className={`${getDisplayClass()} text-8xl md:text-9xl lg:text-10xl xl:text-11xl font-bold`}>
         {multiplier.toFixed(2)}x
       </div>
       
