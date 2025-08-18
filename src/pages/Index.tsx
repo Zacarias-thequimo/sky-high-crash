@@ -82,9 +82,9 @@ const Index = () => {
 
       {/* Splash Overlay */}
       {showSplash && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
           <div className="text-center space-y-6 animate-fade-in">
-            <h1 className="text-3xl font-bold tracking-wide">
+            <h1 className="text-3xl font-bold tracking-wide text-white">
               AVIATOR <span className="text-primary">powered by 999BETS</span>
             </h1>
             <div
