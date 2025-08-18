@@ -91,7 +91,18 @@ export const DualBettingPanel = memo(({
               −
             </button>
             <div className="flex-1 text-center py-3">
-              <div className="text-white font-bold text-lg">{betAmount.toFixed(2)}</div>
+              <input
+                type="number"
+                value={betAmount}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 1;
+                  setBetAmount(Math.max(1, value));
+                }}
+                min="1"
+                step="0.01"
+                disabled={isFlying}
+                className="bg-transparent text-white font-bold text-lg text-center border-none outline-none w-full"
+              />
             </div>
             <button 
               onClick={() => setBetAmount(betAmount + 1)}
@@ -122,7 +133,7 @@ export const DualBettingPanel = memo(({
           onClick={() => {
             if (isFlying && bet.canCashOut) {
               onCashOut(panelId);
-            } else if (!isFlying && betAmount <= balance) {
+            } else if (!isFlying && betAmount >= 1 && betAmount <= balance) {
               onPlaceBet(betAmount, panelId);
             }
           }}

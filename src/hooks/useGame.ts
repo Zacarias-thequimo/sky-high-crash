@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameEngine, initializeGame, calculateProfit, calculatePayout } from '@/utils/gameLogic';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface GameStats {
   totalBets: number;
@@ -23,6 +24,7 @@ export const useGame = () => {
   
   // Player state
   const [balance, setBalance] = useState(0); // Starting balance from deposits only
+  const { user } = useAuth();
   const [betAmount, setBetAmount] = useState(10);
   const [isBetPlaced, setIsBetPlaced] = useState(false);
   const [canCashOut, setCanCashOut] = useState(false);
@@ -89,25 +91,41 @@ export const useGame = () => {
     }
   }), []); // Empty dependency array since callbacks are stable
 
-  // Load recent game history on mount
+  // Load recent game history and user balance on mount
   useEffect(() => {
-    const loadRecentHistory = async () => {
+    const loadData = async () => {
       try {
+        // Load game history
         const { data, error } = await supabase.rpc('get_recent_game_rounds');
         if (error) throw error;
         
         // Convert to multiplier array and reverse to show most recent last
         const recentMultipliers = data?.map((round: any) => Number(round.multiplier)) || [];
         setMultiplierHistory(recentMultipliers.reverse());
+
+        // Load user balance if authenticated
+        if (user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('balance')
+            .eq('id', user.id)
+            .single();
+          
+          if (profileError) {
+            console.error('Error loading user balance:', profileError);
+          } else {
+            setBalance(profile.balance || 0);
+          }
+        }
       } catch (error) {
-        console.error('Error loading game history:', error);
+        console.error('Error loading data:', error);
       }
     };
     
-    loadRecentHistory();
+    loadData();
     initializeGame();
     startNextRound();
-  }, []);
+  }, [user]);
 
   const startNextRound = useCallback(() => {
     setIsCrashed(false);
@@ -123,34 +141,96 @@ export const useGame = () => {
     }, 10000);
   }, [gameEngine]);
 
-  const placeBet = useCallback(() => {
+  const placeBet = useCallback(async (amount: number) => {
     if (isFlying || isBetPlaced) {
       return;
     }
     
-    if (betAmount > balance) {
+    if (amount < 1) {
       toast({
         variant: "destructive",
-        title: "Saldo insuficiente",
-        description: `Você precisa de ${betAmount.toFixed(2)} MZN para fazer esta aposta. Saldo atual: ${balance.toFixed(2)} MZN`
+        title: "Valor inválido",
+        description: "O valor da aposta deve ser pelo menos 1 MZN"
       });
       return;
     }
     
-    setBalance(prev => prev - betAmount);
-    setIsBetPlaced(true);
-    setCanCashOut(true);
-    
-    setGameStats(prev => ({
-      ...prev,
-      totalBets: prev.totalBets + 1
-    }));
-    
-    toast({
-      title: "Aposta realizada!",
-      description: `${betAmount.toFixed(2)} MZN apostado`,
-    });
-  }, [betAmount, balance, isFlying, isBetPlaced, toast]);
+    if (amount > balance) {
+      toast({
+        variant: "destructive",
+        title: "Saldo insuficiente",
+        description: `Você precisa de ${amount.toFixed(2)} MZN para fazer esta aposta. Saldo atual: ${balance.toFixed(2)} MZN`
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para fazer apostas"
+      });
+      return;
+    }
+
+    try {
+      // Create a new game round if needed (for simplicity, we'll create one here)
+      const { data: activeRound, error: roundError } = await supabase
+        .from('game_rounds')
+        .select('id')
+        .eq('is_active', true)
+        .single();
+
+      let roundId = activeRound?.id;
+      
+      if (!roundId) {
+        // Create new round
+        const { data: newRound, error: newRoundError } = await supabase
+          .from('game_rounds')
+          .insert({
+            multiplier: 1.0,
+            is_active: true,
+            seed_hash: `seed_${Date.now()}`
+          })
+          .select('id')
+          .single();
+        
+        if (newRoundError) throw newRoundError;
+        roundId = newRound.id;
+      }
+
+      const { data, error } = await supabase.functions.invoke('place-bet', {
+        body: { 
+          amount: amount,
+          round_id: roundId
+        }
+      });
+
+      if (error) throw error;
+
+      setBalance(data.new_balance);
+      setBetAmount(amount);
+      setIsBetPlaced(true);
+      setCanCashOut(true);
+      
+      setGameStats(prev => ({
+        ...prev,
+        totalBets: prev.totalBets + 1
+      }));
+      
+      toast({
+        title: "Aposta realizada!",
+        description: `${amount.toFixed(2)} MZN apostado`,
+      });
+    } catch (error: any) {
+      console.error('Error placing bet:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao apostar",
+        description: error.message || "Ocorreu um erro ao processar sua aposta"
+      });
+    }
+  }, [betAmount, balance, isFlying, isBetPlaced, user, toast]);
 
   const cashOut = useCallback(() => {
     if (!isFlying || !canCashOut || !isBetPlaced) {

@@ -35,7 +35,7 @@ const Index = () => {
     }
   }, [user, loading, navigate]);
 
-  const handlePlaceBet = (amount: number, panel: 1 | 2) => {
+  const handlePlaceBet = async (amount: number, panel: 1 | 2) => {
     if (panel === 1) {
       setBets(prev => ({
         ...prev,
@@ -47,7 +47,7 @@ const Index = () => {
         panel2: { ...prev.panel2, amount, isPlaced: true, canCashOut: true }
       }));
     }
-    placeBet();
+    await placeBet(amount);
   };
 
   const handleCashOut = (panel: 1 | 2) => {
