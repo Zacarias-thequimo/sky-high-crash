@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Users, TrendingUp, DollarSign, Gift, Minus, Ban, Shield } from 'lucide-react';
+import { ArrowLeft, Users, TrendingUp, DollarSign, Gift, Minus, Ban, Shield, Settings, Construction } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface User {
@@ -52,6 +52,8 @@ const Admin = () => {
   const [removeBalanceUserId, setRemoveBalanceUserId] = useState('');
   const [removeBonusUserId, setRemoveBonusUserId] = useState('');
   const [removeBonusAmount, setRemoveBonusAmount] = useState('');
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState('');
 
   // Check if user is admin with server-side verification
   useEffect(() => {
@@ -105,6 +107,7 @@ const Admin = () => {
     if (profile?.role === 'admin') {
       loadUsers();
       loadAdminActions();
+      loadMaintenanceSettings();
     }
   }, [profile]);
 
@@ -140,6 +143,22 @@ const Admin = () => {
       });
     } else {
       setAdminActions(data || []);
+    }
+  };
+
+  const loadMaintenanceSettings = async () => {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('setting_value')
+      .eq('setting_key', 'maintenance_mode')
+      .single();
+
+    if (error) {
+      console.error('Error loading maintenance settings:', error);
+    } else if (data) {
+      const settings = data.setting_value as { enabled: boolean; message: string };
+      setMaintenanceMode(settings.enabled);
+      setMaintenanceMessage(settings.message);
     }
   };
 
@@ -537,6 +556,55 @@ const Admin = () => {
     }
   };
 
+  const toggleMaintenanceMode = async () => {
+    setLoadingAction(true);
+
+    try {
+      const newMode = !maintenanceMode;
+      const newSettings = {
+        enabled: newMode,
+        message: maintenanceMessage || 'O site está temporariamente em manutenção. Voltaremos em breve.'
+      };
+
+      const { error } = await supabase
+        .from('system_settings')
+        .update({ 
+          setting_value: newSettings,
+          updated_at: new Date().toISOString()
+        })
+        .eq('setting_key', 'maintenance_mode');
+
+      if (error) throw error;
+
+      // Log admin action
+      await supabase
+        .from('admin_actions')
+        .insert({
+          admin_id: user!.id,
+          action_type: newMode ? 'maintenance_enabled' : 'maintenance_disabled',
+          description: `Modo de manutenção ${newMode ? 'ativado' : 'desativado'}`
+        });
+
+      setMaintenanceMode(newMode);
+      
+      toast({
+        title: `Modo de manutenção ${newMode ? 'ativado' : 'desativado'}`,
+        description: newMode ? 'O site agora mostra a página de construção' : 'O site voltou ao normal'
+      });
+
+      await loadAdminActions();
+
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao alterar modo de manutenção',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -635,6 +703,7 @@ const Admin = () => {
             <TabsTrigger value="bonus">Conceder Bônus</TabsTrigger>
             <TabsTrigger value="remove">Remover Saldo</TabsTrigger>
             <TabsTrigger value="admins">Administradores</TabsTrigger>
+            <TabsTrigger value="maintenance">Manutenção</TabsTrigger>
             <TabsTrigger value="actions">Histórico de Ações</TabsTrigger>
           </TabsList>
 
@@ -969,6 +1038,80 @@ const Admin = () => {
                       {loadingAction ? 'Processando...' : 'Remover Admin'}
                     </Button>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Maintenance Tab */}
+          <TabsContent value="maintenance">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Construction className="h-5 w-5" />
+                  Modo de Manutenção
+                </CardTitle>
+                <CardDescription>
+                  Controle se o site exibe a página de construção para todos os usuários
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h3 className="font-medium">Status Atual</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {maintenanceMode ? 'Site em modo de manutenção' : 'Site funcionando normalmente'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Settings className={`h-4 w-4 ${maintenanceMode ? 'text-orange-500' : 'text-green-500'}`} />
+                    <span className={`text-sm font-medium ${maintenanceMode ? 'text-orange-600' : 'text-green-600'}`}>
+                      {maintenanceMode ? 'Manutenção' : 'Ativo'}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Mensagem de Manutenção</label>
+                  <Input
+                    value={maintenanceMessage}
+                    onChange={(e) => setMaintenanceMessage(e.target.value)}
+                    placeholder="O site está temporariamente em manutenção. Voltaremos em breve."
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Esta mensagem será exibida na página de construção
+                  </p>
+                </div>
+
+                {maintenanceMode && (
+                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-md">
+                    <h4 className="font-medium text-orange-800 mb-2">⚠️ Site em Manutenção</h4>
+                    <p className="text-sm text-orange-700">
+                      Todos os usuários (exceto administradores) verão a página de construção. 
+                      Apenas administradores podem acessar o site normalmente.
+                    </p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t space-y-2">
+                  <Button
+                    onClick={toggleMaintenanceMode}
+                    disabled={loadingAction}
+                    className="w-full"
+                    variant={maintenanceMode ? "destructive" : "default"}
+                  >
+                    {loadingAction ? 'Processando...' : (
+                      maintenanceMode ? 'Desativar Modo de Manutenção' : 'Ativar Modo de Manutenção'
+                    )}
+                  </Button>
+                  
+                  <p className="text-xs text-center text-muted-foreground">
+                    {maintenanceMode 
+                      ? 'Clique para voltar o site ao funcionamento normal' 
+                      : 'Clique para colocar o site em modo de manutenção'
+                    }
+                  </p>
                 </div>
               </CardContent>
             </Card>
