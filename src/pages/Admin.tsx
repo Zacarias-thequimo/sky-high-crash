@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Users, TrendingUp, DollarSign, Gift } from 'lucide-react';
+import { ArrowLeft, Users, TrendingUp, DollarSign, Gift, Minus, Ban, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface User {
@@ -49,6 +49,9 @@ const Admin = () => {
   const [newAdminUserId, setNewAdminUserId] = useState('');
   const [demoteAdminUserId, setDemoteAdminUserId] = useState('');
   const [loadingAction, setLoadingAction] = useState(false);
+  const [removeBalanceUserId, setRemoveBalanceUserId] = useState('');
+  const [removeBonusUserId, setRemoveBonusUserId] = useState('');
+  const [removeBonusAmount, setRemoveBonusAmount] = useState('');
 
   // Check if user is admin with server-side verification
   useEffect(() => {
@@ -204,8 +207,8 @@ const Admin = () => {
       setSelectedUserId('');
       setBonusAmount('');
       setBonusDescription('');
-      loadUsers();
-      loadAdminActions();
+      await loadUsers();
+      await loadAdminActions();
 
     } catch (error: any) {
       toast({
@@ -244,8 +247,8 @@ const Admin = () => {
         description: 'Status atualizado com sucesso.'
       });
 
-      loadUsers();
-      loadAdminActions();
+      await loadUsers();
+      await loadAdminActions();
 
     } catch (error: any) {
       toast({
@@ -296,8 +299,8 @@ const Admin = () => {
 
       // Reset form and reload data
       setNewAdminUserId('');
-      loadUsers();
-      loadAdminActions();
+      await loadUsers();
+      await loadAdminActions();
 
     } catch (error: any) {
       toast({
@@ -348,12 +351,184 @@ const Admin = () => {
 
       // Reset form and reload data
       setDemoteAdminUserId('');
-      loadUsers();
-      loadAdminActions();
+      await loadUsers();
+      await loadAdminActions();
 
     } catch (error: any) {
       toast({
         title: 'Erro ao rebaixar administrador',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const removeAllBalance = async () => {
+    if (!removeBalanceUserId) {
+      toast({
+        title: 'Dados inválidos',
+        description: 'Selecione um usuário',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoadingAction(true);
+
+    try {
+      // Get current balance
+      const selectedUser = users.find(u => u.id === removeBalanceUserId);
+      if (!selectedUser || selectedUser.balance <= 0) {
+        toast({
+          title: 'Saldo zerado',
+          description: 'Usuário já tem saldo zero',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const currentBalance = selectedUser.balance;
+
+      // Remove all balance
+      const { error: balanceError } = await supabase.rpc('update_user_balance', {
+        p_user_id: removeBalanceUserId,
+        p_amount: currentBalance,
+        p_operation: 'subtract'
+      });
+
+      if (balanceError) throw balanceError;
+
+      // Log admin action
+      const { error: actionError } = await supabase
+        .from('admin_actions')
+        .insert({
+          admin_id: user!.id,
+          action_type: 'balance_removed',
+          target_user_id: removeBalanceUserId,
+          amount: currentBalance,
+          description: `Saldo removido: ${currentBalance} MZN`
+        });
+
+      if (actionError) throw actionError;
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: removeBalanceUserId,
+          type: 'withdrawal',
+          amount: currentBalance,
+          status: 'completed',
+          description: 'Remoção administrativa de saldo',
+          metadata: {
+            admin_id: user!.id,
+            admin_action: true,
+            transaction_type: 'admin_removal'
+          }
+        });
+
+      if (transactionError) throw transactionError;
+
+      toast({
+        title: 'Saldo removido!',
+        description: `${currentBalance} MZN foi removido da conta do usuário.`
+      });
+
+      setRemoveBalanceUserId('');
+      await loadUsers();
+      await loadAdminActions();
+
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao remover saldo',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const removeBonus = async () => {
+    if (!removeBonusUserId || !removeBonusAmount || parseFloat(removeBonusAmount) <= 0) {
+      toast({
+        title: 'Dados inválidos',
+        description: 'Selecione um usuário e valor válido',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoadingAction(true);
+
+    try {
+      const amount = parseFloat(removeBonusAmount);
+      const selectedUser = users.find(u => u.id === removeBonusUserId);
+      
+      if (!selectedUser || selectedUser.balance < amount) {
+        toast({
+          title: 'Saldo insuficiente',
+          description: 'Usuário não tem saldo suficiente para remoção',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      // Remove bonus
+      const { error: balanceError } = await supabase.rpc('update_user_balance', {
+        p_user_id: removeBonusUserId,
+        p_amount: amount,
+        p_operation: 'subtract'
+      });
+
+      if (balanceError) throw balanceError;
+
+      // Log admin action
+      const { error: actionError } = await supabase
+        .from('admin_actions')
+        .insert({
+          admin_id: user!.id,
+          action_type: 'bonus_removed',
+          target_user_id: removeBonusUserId,
+          amount: amount,
+          description: `Bônus removido: ${amount} MZN`
+        });
+
+      if (actionError) throw actionError;
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: removeBonusUserId,
+          type: 'withdrawal',
+          amount: amount,
+          status: 'completed',
+          description: 'Remoção administrativa de bônus',
+          metadata: {
+            admin_id: user!.id,
+            admin_action: true,
+            transaction_type: 'bonus_removal'
+          }
+        });
+
+      if (transactionError) throw transactionError;
+
+      toast({
+        title: 'Bônus removido!',
+        description: `${amount} MZN foi removido da conta do usuário.`
+      });
+
+      setRemoveBonusUserId('');
+      setRemoveBonusAmount('');
+      await loadUsers();
+      await loadAdminActions();
+
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao remover bônus',
         description: error.message,
         variant: 'destructive'
       });
@@ -458,7 +633,8 @@ const Admin = () => {
           <TabsList>
             <TabsTrigger value="users">Usuários</TabsTrigger>
             <TabsTrigger value="bonus">Conceder Bônus</TabsTrigger>
-            <TabsTrigger value="admins">Adicionar Admin</TabsTrigger>
+            <TabsTrigger value="remove">Remover Saldo</TabsTrigger>
+            <TabsTrigger value="admins">Administradores</TabsTrigger>
             <TabsTrigger value="actions">Histórico de Ações</TabsTrigger>
           </TabsList>
 
@@ -501,7 +677,7 @@ const Admin = () => {
                           <TableCell>{user.total_deposited?.toFixed(2) || '0.00'} MZN</TableCell>
                           <TableCell>
                             <Badge variant={user.is_active ? 'default' : 'destructive'}>
-                              {user.is_active ? 'Ativo' : 'Suspenso'}
+                              {user.is_active ? 'Ativo' : 'Banido'}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -510,14 +686,26 @@ const Admin = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => toggleUserStatus(user.id, user.is_active)}
-                              disabled={loadingAction || user.role === 'admin'}
-                            >
-                              {user.is_active ? 'Suspender' : 'Ativar'}
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => toggleUserStatus(user.id, user.is_active)}
+                                disabled={loadingAction || user.role === 'admin'}
+                              >
+                                {user.is_active ? (
+                                  <>
+                                    <Ban className="h-3 w-3 mr-1" />
+                                    Banir
+                                  </>
+                                ) : (
+                                  <>
+                                    <Shield className="h-3 w-3 mr-1" />
+                                    Desbanir
+                                  </>
+                                )}
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -589,13 +777,122 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* Remove Balance/Bonus Tab */}
+          <TabsContent value="remove">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Remove All Balance */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-destructive">
+                    <Minus className="h-5 w-5" />
+                    Remover Todo Saldo
+                  </CardTitle>
+                  <CardDescription>
+                    Remove completamente o saldo de um usuário
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Selecionar Usuário</label>
+                    <select
+                      value={removeBalanceUserId}
+                      onChange={(e) => setRemoveBalanceUserId(e.target.value)}
+                      className="w-full mt-1 p-2 border rounded-md bg-background"
+                    >
+                      <option value="">Escolha um usuário...</option>
+                      {users.filter(u => u.role !== 'admin' && u.balance > 0).map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.full_name || user.email} - {user.balance?.toFixed(2) || '0.00'} MZN
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+                    <h4 className="font-medium text-red-800 mb-2">⚠️ Ação Irreversível</h4>
+                    <p className="text-sm text-red-700">
+                      Esta ação removerá completamente o saldo do usuário. Use com extrema cautela.
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={removeAllBalance}
+                    disabled={loadingAction || !removeBalanceUserId}
+                    className="w-full"
+                    variant="destructive"
+                  >
+                    {loadingAction ? 'Processando...' : 'Remover Todo Saldo'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Remove Specific Bonus */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-orange-600">
+                    <Gift className="h-5 w-5" />
+                    Remover Bônus
+                  </CardTitle>
+                  <CardDescription>
+                    Remove um valor específico do saldo de um usuário
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Selecionar Usuário</label>
+                    <select
+                      value={removeBonusUserId}
+                      onChange={(e) => setRemoveBonusUserId(e.target.value)}
+                      className="w-full mt-1 p-2 border rounded-md bg-background"
+                    >
+                      <option value="">Escolha um usuário...</option>
+                      {users.filter(u => u.role !== 'admin' && u.balance > 0).map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.full_name || user.email} - {user.balance?.toFixed(2) || '0.00'} MZN
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Valor a Remover (MZN)</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      value={removeBonusAmount}
+                      onChange={(e) => setRemoveBonusAmount(e.target.value)}
+                      placeholder="0.00"
+                    />
+                  </div>
+
+                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-md">
+                    <h4 className="font-medium text-orange-800 mb-2">⚠️ Atenção</h4>
+                    <p className="text-sm text-orange-700">
+                      Certifique-se que o usuário tem saldo suficiente antes de remover.
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={removeBonus}
+                    disabled={loadingAction || !removeBonusUserId || !removeBonusAmount}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    {loadingAction ? 'Processando...' : 'Remover Bônus'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Add Admin Tab */}
           <TabsContent value="admins">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  Adicionar Novo Admin
+                  Gestão de Administradores
                 </CardTitle>
                 <CardDescription>
                   Promova um usuário existente para administrador

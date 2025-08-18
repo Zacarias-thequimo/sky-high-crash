@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/integrations/supabase/client'
 
 export const DepositButton = () => {
@@ -11,6 +12,7 @@ export const DepositButton = () => {
   const [phone, setPhone] = useState<string>('+258')
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { refreshProfile } = useAuth()
 
   const handleDeposit = async () => {
     if (!amount || amount <= 0) {
@@ -33,6 +35,10 @@ export const DepositButton = () => {
           description: `${amount} MZN foi adicionado ao seu saldo.`,
           variant: 'default'
         })
+        
+        // Refresh profile to get updated balance
+        await refreshProfile()
+        
         setOpen(false)
         // Resetar campos
         setAmount(100)
