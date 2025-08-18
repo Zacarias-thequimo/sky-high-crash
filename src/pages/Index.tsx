@@ -30,10 +30,16 @@ const Index = () => {
     panel2: { amount: 8.00, isPlaced: false, canCashOut: false }
   });
 
-  // Redirect to auth if not logged in
+  // Splash state and redirect/splash logic
+  const [showSplash, setShowSplash] = useState(false);
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
+    }
+    if (!loading && user) {
+      setShowSplash(true);
+      const t = setTimeout(() => setShowSplash(false), 5000);
+      return () => clearTimeout(t);
     }
   }, [user, loading, navigate]);
 
@@ -73,6 +79,21 @@ const Index = () => {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col w-full overflow-hidden">
       {/* Header */}
       <Header multiplierHistory={multiplierHistory} balance={balance} />
+
+      {/* Splash Overlay */}
+      {showSplash && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <div className="text-center space-y-6 animate-fade-in">
+            <h1 className="text-3xl font-bold tracking-wide">
+              AVIATOR <span className="text-primary">powered by 999BETS</span>
+            </h1>
+            <div
+              className="mx-auto h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin"
+              aria-label="Carregando"
+            />
+          </div>
+        </div>
+      )}
       
       {/* Main Layout - Mobile First Responsive */}
       <div className="flex-1 flex flex-col w-full h-full">

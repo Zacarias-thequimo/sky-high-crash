@@ -29,6 +29,7 @@ export const useGame = () => {
   const [isBetPlaced, setIsBetPlaced] = useState(false);
   const [canCashOut, setCanCashOut] = useState(false);
   const [cashOutMultiplier, setCashOutMultiplier] = useState(0);
+  const [activeBetId, setActiveBetId] = useState<string | null>(null);
   
   // History and stats
   const [multiplierHistory, setMultiplierHistory] = useState<number[]>([]);
@@ -133,6 +134,7 @@ export const useGame = () => {
     setIsBetPlaced(false);
     setCanCashOut(false);
     setCashOutMultiplier(0);
+    setActiveBetId(null);
     setCurrentMultiplier(1.0);
     
     // Start game after delay (10 seconds)
@@ -211,11 +213,30 @@ export const useGame = () => {
 
       if (error) throw error;
 
-      // Update with server response for accuracy
-      setBalance(data.new_balance);
+      // Update with server response for accuracy (if provided)
+      if (typeof data?.new_balance === 'number') {
+        setBalance(data.new_balance);
+      }
       setBetAmount(amount);
       setIsBetPlaced(true);
       setCanCashOut(true);
+
+      // Keep a reference to the active bet id for reliable cash-out
+      if (data?.bet_id) {
+        setActiveBetId(data.bet_id);
+      } else {
+        try {
+          const { data: lastBet } = await supabase
+            .from('bets')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .order('placed_at', { ascending: false })
+            .limit(1)
+            .single();
+          if (lastBet?.id) setActiveBetId(lastBet.id);
+        } catch (_) { /* ignore */ }
+      }
       
       setGameStats(prev => ({
         ...prev,
@@ -250,32 +271,44 @@ export const useGame = () => {
     setCanCashOut(false);
     
     try {
-      // Find active bet for this user
-      const { data: activeBet, error: betError } = await supabase
-        .from('bets')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .single();
+      // Use stored bet id when available; fallback to latest active bet
+      let betIdToCashOut = activeBetId;
+      if (!betIdToCashOut) {
+        const { data: activeBet, error: betError } = await supabase
+          .from('bets')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .order('placed_at', { ascending: false })
+          .limit(1)
+          .single();
 
-      if (betError || !activeBet) {
-        throw new Error('No active bet found');
+        if (betError || !activeBet) {
+          throw new Error('No active bet found');
+        }
+        betIdToCashOut = activeBet.id;
       }
 
       const { data, error } = await supabase.functions.invoke('cash-out', {
         body: { 
-          bet_id: activeBet.id,
+          bet_id: betIdToCashOut,
           multiplier: currentMultiplier
         }
       });
 
       if (error) throw error;
 
-      // Update balance with server response
-      setBalance(data.new_balance);
+      // Update balance with server response or fallback to local payout
+      if (typeof data?.new_balance === 'number') {
+        setBalance(data.new_balance);
+      } else {
+        setBalance(prev => prev + payout);
+      }
       setCashOutMultiplier(currentMultiplier);
       
       handleWin(currentMultiplier);
+      setIsBetPlaced(false);
+      setActiveBetId(null);
       
       toast({
         title: "Saque bem sucedido!",
@@ -291,7 +324,7 @@ export const useGame = () => {
         description: error.message || "Ocorreu um erro ao processar seu saque"
       });
     }
-  }, [isFlying, canCashOut, isBetPlaced, betAmount, currentMultiplier, user, toast]);
+  }, [isFlying, canCashOut, isBetPlaced, betAmount, currentMultiplier, user, activeBetId, toast]);
 
   const handleWin = useCallback((multiplier: number) => {
     setGameStats(prev => {
