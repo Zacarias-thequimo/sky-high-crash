@@ -49,6 +49,10 @@ export const WithdrawButton = ({ balance, onSuccess }: WithdrawButtonProps) => {
       return;
     }
 
+    if (isLoading) {
+      return; // Prevent multiple clicks
+    }
+
     setIsLoading(true);
 
     try {

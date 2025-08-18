@@ -4,8 +4,10 @@ import { Header } from '@/components/Header';
 import { PlayersList } from '@/components/PlayersList';
 import { AviatorGameArea } from '@/components/AviatorGameArea';
 import { DualBettingPanel } from '@/components/DualBettingPanel';
+import { WithdrawButton } from '@/components/WithdrawButton';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {

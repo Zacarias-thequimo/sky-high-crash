@@ -174,6 +174,9 @@ export const useGame = () => {
     }
 
     try {
+      // Update local balance immediately for better UX
+      setBalance(prev => prev - amount);
+      
       // Create a new game round if needed (for simplicity, we'll create one here)
       const { data: activeRound, error: roundError } = await supabase
         .from('game_rounds')
@@ -208,6 +211,7 @@ export const useGame = () => {
 
       if (error) throw error;
 
+      // Update with server response for accuracy
       setBalance(data.new_balance);
       setBetAmount(amount);
       setIsBetPlaced(true);
@@ -224,6 +228,8 @@ export const useGame = () => {
       });
     } catch (error: any) {
       console.error('Error placing bet:', error);
+      // Revert balance change on error
+      setBalance(prev => prev + amount);
       toast({
         variant: "destructive",
         title: "Erro ao apostar",
@@ -232,25 +238,60 @@ export const useGame = () => {
     }
   }, [betAmount, balance, isFlying, isBetPlaced, user, toast]);
 
-  const cashOut = useCallback(() => {
-    if (!isFlying || !canCashOut || !isBetPlaced) {
+  const cashOut = useCallback(async () => {
+    if (!isFlying || !canCashOut || !isBetPlaced || !user) {
       return;
     }
     
     const payout = calculatePayout(betAmount, currentMultiplier);
     const profit = calculateProfit(betAmount, currentMultiplier);
     
-    setBalance(prev => prev + payout);
+    // Disable cash out immediately to prevent multiple clicks
     setCanCashOut(false);
-    setCashOutMultiplier(currentMultiplier);
     
-    handleWin(currentMultiplier);
-    
-    toast({
-      title: "Saque bem sucedido!",
-      description: `Ganhou ${profit.toFixed(2)} MZN (${currentMultiplier.toFixed(2)}x)`,
-    });
-  }, [isFlying, canCashOut, isBetPlaced, betAmount, currentMultiplier, toast]);
+    try {
+      // Find active bet for this user
+      const { data: activeBet, error: betError } = await supabase
+        .from('bets')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (betError || !activeBet) {
+        throw new Error('No active bet found');
+      }
+
+      const { data, error } = await supabase.functions.invoke('cash-out', {
+        body: { 
+          bet_id: activeBet.id,
+          multiplier: currentMultiplier
+        }
+      });
+
+      if (error) throw error;
+
+      // Update balance with server response
+      setBalance(data.new_balance);
+      setCashOutMultiplier(currentMultiplier);
+      
+      handleWin(currentMultiplier);
+      
+      toast({
+        title: "Saque bem sucedido!",
+        description: `Ganhou ${profit.toFixed(2)} MZN (${currentMultiplier.toFixed(2)}x)`,
+      });
+    } catch (error: any) {
+      console.error('Error cashing out:', error);
+      // Re-enable cash out on error
+      setCanCashOut(true);
+      toast({
+        variant: "destructive",
+        title: "Erro no saque",
+        description: error.message || "Ocorreu um erro ao processar seu saque"
+      });
+    }
+  }, [isFlying, canCashOut, isBetPlaced, betAmount, currentMultiplier, user, toast]);
 
   const handleWin = useCallback((multiplier: number) => {
     setGameStats(prev => {
