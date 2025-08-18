@@ -54,8 +54,13 @@ const App = () => {
   }
 
   // Show maintenance page if enabled (except for admin routes)
-  if (maintenanceMode && !window.location.pathname.includes('/admin')) {
-    return <Maintenance />;
+  if (maintenanceMode) {
+    const currentPath = window.location.pathname;
+    const isAdminRoute = currentPath === '/admin' || currentPath.startsWith('/admin/');
+    
+    if (!isAdminRoute) {
+      return <Maintenance />;
+    }
   }
 
   return (
