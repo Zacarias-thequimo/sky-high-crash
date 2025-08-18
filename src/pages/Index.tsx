@@ -32,14 +32,22 @@ const Index = () => {
 
   // Splash state and redirect/splash logic
   const [showSplash, setShowSplash] = useState(false);
+  const [isCashOutProcessing, setIsCashOutProcessing] = useState(false);
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
+      return;
     }
     if (!loading && user) {
-      setShowSplash(true);
-      const t = setTimeout(() => setShowSplash(false), 5000);
-      return () => clearTimeout(t);
+      const already = sessionStorage.getItem('splashShown');
+      if (!already) {
+        setShowSplash(true);
+        const t = setTimeout(() => {
+          setShowSplash(false);
+          sessionStorage.setItem('splashShown', '1');
+        }, 5000);
+        return () => clearTimeout(t);
+      }
     }
   }, [user, loading, navigate]);
 
@@ -58,7 +66,10 @@ const Index = () => {
     await placeBet(amount);
   };
 
-  const handleCashOut = (panel: 1 | 2) => {
+  const handleCashOut = async (panel: 1 | 2) => {
+    if (isCashOutProcessing) return;
+    setIsCashOutProcessing(true);
+
     if (panel === 1) {
       setBets(prev => ({
         ...prev,
@@ -70,7 +81,11 @@ const Index = () => {
         panel2: { ...prev.panel2, canCashOut: false }
       }));
     }
-    cashOut();
+    try {
+      await cashOut();
+    } finally {
+      setIsCashOutProcessing(false);
+    }
   };
 
   const canCashOut = bets.panel1.canCashOut || bets.panel2.canCashOut;

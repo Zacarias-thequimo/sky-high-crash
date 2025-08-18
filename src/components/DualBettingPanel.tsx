@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface DualBettingPanelProps {
@@ -26,6 +26,7 @@ export const DualBettingPanel = memo(({
   const [autoMode1, setAutoMode1] = useState(false);
   const [autoMode2, setAutoMode2] = useState(false);
 
+  const [isProcessingCashOut, setIsProcessingCashOut] = useState(false);
   const quickAmounts = [32, 80, 160, 800];
 
   const BettingSection = ({ 
@@ -56,7 +57,13 @@ export const DualBettingPanel = memo(({
       return `Aposta ${betAmount.toFixed(2)} MZN`;
     };
 
-    const isDisabled = isFlying && (!bet.isPlaced || !bet.canCashOut);
+    const isDisabled = (isFlying && (!bet.isPlaced || !bet.canCashOut)) || (isProcessingCashOut && isFlying && bet.canCashOut);
+
+    useEffect(() => {
+      if (!isFlying || !bet.canCashOut) {
+        setIsProcessingCashOut(false);
+      }
+    }, [isFlying, bet.canCashOut]);
 
     return (
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3 space-y-3">
@@ -132,6 +139,8 @@ export const DualBettingPanel = memo(({
         <Button
           onClick={() => {
             if (isFlying && bet.canCashOut) {
+              if (isProcessingCashOut) return;
+              setIsProcessingCashOut(true);
               onCashOut(panelId);
             } else if (!isFlying && betAmount >= 1 && betAmount <= balance) {
               onPlaceBet(betAmount, panelId);

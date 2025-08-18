@@ -86,17 +86,8 @@ export const AviatorGameArea = memo(({
         </div>
       </div>
 
-      {/* Cash Out Button */}
-      {isFlying && canCashOut && (
-        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20">
-          <button 
-            onClick={onCashOut}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-2 py-1 xs:px-3 xs:py-2 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-lg animate-pulse text-xs xs:text-sm sm:text-base"
-          >
-            SACAR {multiplier.toFixed(2)}x
-          </button>
-        </div>
-      )}
+      {/* Cash Out Button - removed as per UX request */}
+      {/* No overlay cash out button here anymore */}
 
       {/* Crash Effect */}
       {showCrashEffect && (
