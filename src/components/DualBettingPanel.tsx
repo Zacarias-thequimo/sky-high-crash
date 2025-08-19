@@ -25,9 +25,26 @@ export const DualBettingPanel = memo(({
   const [betAmount2, setBetAmount2] = useState(8.00);
   const [autoMode1, setAutoMode1] = useState(false);
   const [autoMode2, setAutoMode2] = useState(false);
+  const [pendingBet1, setPendingBet1] = useState(false);
+  const [pendingBet2, setPendingBet2] = useState(false);
 
   const [isProcessingCashOut, setIsProcessingCashOut] = useState(false);
   const quickAmounts = [32, 80, 160, 800];
+
+  // Effect to handle pending bets when game starts
+  useEffect(() => {
+    if (!isFlying && (pendingBet1 || pendingBet2)) {
+      // Game just started, process pending bets
+      if (pendingBet1 && betAmount1 >= 1 && betAmount1 <= balance) {
+        onPlaceBet(betAmount1, 1);
+        setPendingBet1(false);
+      }
+      if (pendingBet2 && betAmount2 >= 1 && betAmount2 <= balance) {
+        onPlaceBet(betAmount2, 2);
+        setPendingBet2(false);
+      }
+    }
+  }, [isFlying, pendingBet1, pendingBet2, betAmount1, betAmount2, balance, onPlaceBet]);
 
   const BettingSection = ({ 
     panelId, 
@@ -43,17 +60,26 @@ export const DualBettingPanel = memo(({
     setAutoMode: (auto: boolean) => void;
   }) => {
     const bet = panelId === 1 ? bets.panel1 : bets.panel2;
+    const isPending = panelId === 1 ? pendingBet1 : pendingBet2;
+    const setPending = panelId === 1 ? setPendingBet1 : setPendingBet2;
     
     const getButtonText = () => {
-      if (isFlying && bet.isPlaced && bet.canCashOut) {
-        return `Sacar ${(betAmount * currentMultiplier).toFixed(2)} MZN`;
+      // If bet is placed and can cash out (yellow button)
+      if (bet.isPlaced && bet.canCashOut) {
+        return `Sacar ${(betAmount * currentMultiplier).toFixed(2)} USD`;
       }
-      if (isFlying && bet.isPlaced && !bet.canCashOut) {
+      
+      // If bet is placed but can't cash out anymore
+      if (bet.isPlaced && !bet.canCashOut) {
         return 'Sacou!';
       }
-      if (isFlying && !bet.isPlaced) {
-        return 'Voando...';
+      
+      // If there's a pending bet (red button)
+      if (isPending) {
+        return 'Cancelar';
       }
+      
+      // Default bet button (green)
       return (
         <div className="text-center">
           <div className="text-lg font-bold">Bet</div>
@@ -62,7 +88,65 @@ export const DualBettingPanel = memo(({
       );
     };
 
-    const isDisabled = (isFlying && (!bet.isPlaced || !bet.canCashOut)) || (isProcessingCashOut && isFlying && bet.canCashOut);
+    const getButtonColor = () => {
+      // Yellow for cash out
+      if (bet.isPlaced && bet.canCashOut) {
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      }
+      
+      // Gray for already cashed out
+      if (bet.isPlaced && !bet.canCashOut) {
+        return 'bg-gray-500';
+      }
+      
+      // Red for pending bet
+      if (isPending) {
+        return 'bg-red-500 hover:bg-red-600';
+      }
+      
+      // Green for normal bet
+      return 'bg-green-500 hover:bg-green-600';
+    };
+
+    const handleButtonClick = () => {
+      // If bet is placed and can cash out
+      if (bet.isPlaced && bet.canCashOut) {
+        if (isProcessingCashOut) return;
+        setIsProcessingCashOut(true);
+        onCashOut(panelId);
+        return;
+      }
+      
+      // If there's a pending bet, cancel it
+      if (isPending) {
+        setPending(false);
+        return;
+      }
+      
+      // If bet is not placed and amount is valid
+      if (!bet.isPlaced && betAmount >= 1 && betAmount <= balance) {
+        if (isFlying) {
+          // During flight, set as pending
+          setPending(true);
+        } else {
+          // Not flying, place bet immediately
+          onPlaceBet(betAmount, panelId);
+        }
+      }
+    };
+
+    const isButtonDisabled = () => {
+      // Disable if processing cash out
+      if (isProcessingCashOut && bet.canCashOut) return true;
+      
+      // Disable if bet is placed but can't cash out
+      if (bet.isPlaced && !bet.canCashOut) return true;
+      
+      // Disable if amount is invalid
+      if (!bet.isPlaced && !isPending && (betAmount < 1 || betAmount > balance)) return true;
+      
+      return false;
+    };
 
     useEffect(() => {
       if (!isFlying || !bet.canCashOut) {
@@ -151,21 +235,11 @@ export const DualBettingPanel = memo(({
 
         {/* Action Button */}
         <Button
-          onClick={() => {
-            if (isFlying && bet.canCashOut) {
-              if (isProcessingCashOut) return;
-              setIsProcessingCashOut(true);
-              onCashOut(panelId);
-            } else if (!isFlying && betAmount >= 1 && betAmount <= balance) {
-              onPlaceBet(betAmount, panelId);
-            }
-          }}
-          disabled={isDisabled}
-          className={`w-full py-6 font-bold text-lg rounded-lg ${
-            isFlying && bet.canCashOut 
-              ? 'bg-orange-500 hover:bg-orange-600 text-white' 
-              : 'bg-green-500 hover:bg-green-600 text-white'
-          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={handleButtonClick}
+          disabled={isButtonDisabled()}
+          className={`w-full py-6 font-bold text-lg rounded-lg text-white ${getButtonColor()} ${
+            isButtonDisabled() ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           {getButtonText()}
         </Button>
@@ -173,12 +247,22 @@ export const DualBettingPanel = memo(({
         {/* Bet Info */}
         {bet.isPlaced && (
           <div className="text-center text-sm text-gray-400">
-            Aposta ativa: {betAmount.toFixed(2)} MZN
-            {isFlying && bet.canCashOut && (
+            Aposta ativa: {betAmount.toFixed(2)} USD
+            {bet.canCashOut && (
               <div className="text-green-400 mt-1">
-                Ganho potencial: {(betAmount * currentMultiplier).toFixed(2)} MZN
+                Ganho potencial: {(betAmount * currentMultiplier).toFixed(2)} USD
               </div>
             )}
+          </div>
+        )}
+        
+        {/* Pending Bet Info */}
+        {isPending && (
+          <div className="text-center text-sm text-orange-400">
+            Aposta pendente: {betAmount.toFixed(2)} USD
+            <div className="text-xs text-gray-500 mt-1">
+              Será processada na próxima rodada
+            </div>
           </div>
         )}
       </div>
