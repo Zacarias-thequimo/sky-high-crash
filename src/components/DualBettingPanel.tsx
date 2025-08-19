@@ -54,7 +54,12 @@ export const DualBettingPanel = memo(({
       if (isFlying && !bet.isPlaced) {
         return 'Voando...';
       }
-      return `Aposta ${betAmount.toFixed(2)} MZN`;
+      return (
+        <div className="text-center">
+          <div className="text-lg font-bold">Bet</div>
+          <div className="text-sm">{betAmount.toFixed(2)} USD</div>
+        </div>
+      );
     };
 
     const isDisabled = (isFlying && (!bet.isPlaced || !bet.canCashOut)) || (isProcessingCashOut && isFlying && bet.canCashOut);
@@ -66,54 +71,45 @@ export const DualBettingPanel = memo(({
     }, [isFlying, bet.canCashOut]);
 
     return (
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3 space-y-3">
+      <div className="bg-gray-800 border border-gray-600 rounded-lg p-4 space-y-4">
         {/* Mode Tabs */}
-        <div className="flex rounded-lg overflow-hidden bg-gray-700/50">
+        <div className="flex rounded overflow-hidden">
           <button 
             onClick={() => setAutoMode(false)}
-            className={`flex-1 py-2 text-sm font-medium ${
-              !autoMode ? 'bg-gray-600 text-white' : 'text-gray-400'
+            className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
+              !autoMode ? 'bg-white text-black' : 'bg-gray-700 text-gray-400 hover:text-white'
             }`}
           >
-            Aposta
+            Bet
           </button>
           <button 
             onClick={() => setAutoMode(true)}
-            className={`flex-1 py-2 text-sm font-medium ${
-              autoMode ? 'bg-gray-600 text-white' : 'text-gray-400'
+            className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
+              autoMode ? 'bg-white text-black' : 'bg-gray-700 text-gray-400 hover:text-white'
             }`}
           >
-            Automático
+            Auto
           </button>
         </div>
 
         {/* Bet Amount Controls */}
-        <div className="space-y-3">
-          <div className="flex items-center border border-gray-600 rounded bg-gray-700/50">
+        <div className="space-y-4">
+          <div className="flex items-center bg-gray-700 rounded-lg">
             <button 
               onClick={() => setBetAmount(Math.max(1, betAmount - 1))}
-              className="px-3 py-3 text-gray-400 hover:text-white text-lg"
+              className="px-4 py-3 text-white hover:bg-gray-600 rounded-l-lg text-xl font-bold"
               disabled={isFlying}
             >
               −
             </button>
-            <div className="flex-1 text-center py-3">
-              <input
-                type="number"
-                value={betAmount}
-                onChange={(e) => {
-                  const value = parseFloat(e.target.value) || 1;
-                  setBetAmount(Math.max(1, value));
-                }}
-                min="1"
-                step="0.01"
-                disabled={isFlying}
-                className="bg-transparent text-white font-bold text-lg text-center border-none outline-none w-full"
-              />
+            <div className="flex-1 text-center py-3 bg-gray-700">
+              <div className="text-white font-bold text-xl">
+                {betAmount.toFixed(2)}
+              </div>
             </div>
             <button 
               onClick={() => setBetAmount(betAmount + 1)}
-              className="px-3 py-3 text-gray-400 hover:text-white text-lg"
+              className="px-4 py-3 text-white hover:bg-gray-600 rounded-r-lg text-xl font-bold"
               disabled={isFlying}
             >
               +
@@ -122,16 +118,34 @@ export const DualBettingPanel = memo(({
 
           {/* Quick Amount Buttons */}
           <div className="grid grid-cols-4 gap-2">
-            {quickAmounts.map((amount) => (
-              <button
-                key={amount}
-                onClick={() => setBetAmount(amount)}
-                disabled={isFlying}
-                className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 px-2 rounded disabled:opacity-50 font-medium"
-              >
-                {amount}
-              </button>
-            ))}
+            <button
+              onClick={() => setBetAmount(1)}
+              disabled={isFlying}
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+            >
+              1
+            </button>
+            <button
+              onClick={() => setBetAmount(2)}
+              disabled={isFlying}
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+            >
+              2
+            </button>
+            <button
+              onClick={() => setBetAmount(5)}
+              disabled={isFlying}
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+            >
+              5
+            </button>
+            <button
+              onClick={() => setBetAmount(10)}
+              disabled={isFlying}
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+            >
+              10
+            </button>
           </div>
         </div>
 
@@ -147,7 +161,7 @@ export const DualBettingPanel = memo(({
             }
           }}
           disabled={isDisabled}
-          className={`w-full py-4 font-bold text-base xs:text-lg ${
+          className={`w-full py-6 font-bold text-lg rounded-lg ${
             isFlying && bet.canCashOut 
               ? 'bg-orange-500 hover:bg-orange-600 text-white' 
               : 'bg-green-500 hover:bg-green-600 text-white'
