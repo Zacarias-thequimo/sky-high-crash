@@ -123,28 +123,22 @@ export const DualBettingPanel = memo(({
         return;
       }
       
-      // If bet is not placed and amount is valid
-      if (!bet.isPlaced && betAmount >= 1 && betAmount <= balance) {
-        if (isFlying) {
-          // During flight, set as pending
+      // If game is flying and no bet placed yet, set as pending
+      if (isFlying && !bet.isPlaced) {
+        if (betAmount >= 1 && betAmount <= balance) {
           setPending(true);
-        } else {
-          // Not flying, place bet immediately
-          onPlaceBet(betAmount, panelId);
         }
+        return;
+      }
+      
+      // If not flying and no bet placed, place bet immediately
+      if (!isFlying && !bet.isPlaced && betAmount >= 1 && betAmount <= balance) {
+        onPlaceBet(betAmount, panelId);
       }
     };
 
     const isButtonDisabled = () => {
-      // Disable if processing cash out
-      if (isProcessingCashOut && bet.canCashOut) return true;
-      
-      // Disable if bet is placed but can't cash out
-      if (bet.isPlaced && !bet.canCashOut) return true;
-      
-      // Disable if amount is invalid
-      if (!bet.isPlaced && !isPending && (betAmount < 1 || betAmount > balance)) return true;
-      
+      // Never disable - always allow interaction
       return false;
     };
 
@@ -182,7 +176,6 @@ export const DualBettingPanel = memo(({
             <button 
               onClick={() => setBetAmount(Math.max(1, betAmount - 1))}
               className="px-4 py-3 text-white hover:bg-gray-600 rounded-l-lg text-xl font-bold"
-              disabled={isFlying}
             >
               −
             </button>
@@ -194,7 +187,6 @@ export const DualBettingPanel = memo(({
             <button 
               onClick={() => setBetAmount(betAmount + 1)}
               className="px-4 py-3 text-white hover:bg-gray-600 rounded-r-lg text-xl font-bold"
-              disabled={isFlying}
             >
               +
             </button>
@@ -204,29 +196,25 @@ export const DualBettingPanel = memo(({
           <div className="grid grid-cols-4 gap-2">
             <button
               onClick={() => setBetAmount(1)}
-              disabled={isFlying}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded font-medium"
             >
               1
             </button>
             <button
               onClick={() => setBetAmount(2)}
-              disabled={isFlying}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded font-medium"
             >
               2
             </button>
             <button
               onClick={() => setBetAmount(5)}
-              disabled={isFlying}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded font-medium"
             >
               5
             </button>
             <button
               onClick={() => setBetAmount(10)}
-              disabled={isFlying}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded disabled:opacity-50 font-medium"
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded font-medium"
             >
               10
             </button>
