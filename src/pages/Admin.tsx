@@ -637,7 +637,7 @@ const Admin = () => {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Painel de Administração</h1>
-            <p className="text-muted-foreground">Controle e gerencie o SkyCrash</p>
+            <p className="text-muted-foreground">Controle e gerencie o Aviator - 999bets</p>
           </div>
         </div>
 

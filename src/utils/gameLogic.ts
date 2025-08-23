@@ -1,4 +1,4 @@
-// Game logic for SkyCrash
+// Game logic for Aviator - 999bets
 
 export interface GameRound {
   id: string;
